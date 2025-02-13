@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 from src.home_automation.tools.summarizer import summarize
 from src.home_automation.tools.array import array_out
+from src.home_automation.tools.room import room_select
 
 load_dotenv()
 
@@ -40,6 +41,8 @@ class HomeAutomation():
 		return Agent(
 			config=self.agents_config['home_analyst'],
 			verbose=True,
+			memory=True,
+			max_rpm=5000,
 			allow_delegation=True,
 			llm=self.llm,
 			tools=[summarize.context_sum],
@@ -50,9 +53,11 @@ class HomeAutomation():
 		return Agent(
 			config=self.agents_config['location_detector'],
 			verbose=True,
+			memory=True,
+			max_rpm=5000,
 			allow_delegation=False,
 			llm=self.llm,
-			tools=[array_out.arrayout],
+			tools=[room_select.list_room],
 		)
 
 	# To learn more about structured task outputs, 
