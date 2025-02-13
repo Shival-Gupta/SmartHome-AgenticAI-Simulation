@@ -13,6 +13,10 @@ public class IotManager : MonoBehaviour
     [SerializeField] private WashingMachineController washingMachineController;
 
     public bool tvOn = false;
+    [Range(0, 100)] public int tvVolume = 10;
+    public int tvChannel = 1;
+    public string tvSource = "HDMI1";
+
     [Range(0, 3)] public int inductionHeat = 0;
 
     //Fridge Controls
@@ -89,8 +93,15 @@ public class IotManager : MonoBehaviour
                 }
             }
         }
+
         if (tvController != null)
+        {
             tvController.ToggleTV(tvOn);
+            tvController.SetVolume(tvVolume);
+            tvController.SetChannel(tvChannel);
+            tvController.SetSource(tvSource);
+        }
+
 
         if (inductionController != null)
             inductionController.heatLevel = inductionHeat;
