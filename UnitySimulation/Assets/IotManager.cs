@@ -15,7 +15,14 @@ public class IotManager : MonoBehaviour
     public bool tvOn = false;
     [Range(0, 3)] public int inductionHeat = 0;
 
-    [Range(-10, 10)] public int fridgeTemperature = 4;  // Adjustable in Inspector
+    //Fridge Controls
+    public bool fridgeOn = false;
+    [Range(-10, 10)] public int fridgeTemperature = 4;
+    [Range(-30, -10)] public int freezeTemperature = -18;
+
+    [Header("Fridge Door Status (Set manually for testing)")]
+    public bool fridgeDoorOpen = false;
+    public bool freezeDoorOpen = false;
 
     [Range(16, 30)] public int acTemperature = 24;
     [Range(0, 3)] public int acFanSpeed = 1;
@@ -89,7 +96,14 @@ public class IotManager : MonoBehaviour
             inductionController.heatLevel = inductionHeat;
 
         if (fridgeController != null)
+        {
+            fridgeController.ToggleFridge(fridgeOn);
             fridgeController.SetTemperature(fridgeTemperature);
+            fridgeController.SetFreezeTemperature(freezeTemperature);
+            fridgeController.mainDoorOpen = fridgeDoorOpen;
+            fridgeController.freezeDoorOpen = freezeDoorOpen;
+        }
+            //fridgeController.SetTemperature(fridgeTemperature);
 
         /*if (acController != null)
            acController.SetTemperature(acTemperature);*/
