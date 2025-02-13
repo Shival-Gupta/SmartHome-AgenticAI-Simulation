@@ -1,0 +1,33 @@
+# src/home_automation/config/tasks.yaml
+home_analyst_task:
+  description: >
+    thoroughly understand the context {topic} by the user
+    understanding and summerizing the context
+    summerizing the context to conclusion
+    provide direct output without any useless text in it
+    understand and provide to the point solution
+    provide solution for the problem in short
+    
+  expected_output: >
+    a simple text that is solution to the problem {topic}
+  agent: home_analyst
+
+location_detector_task:
+  description: >
+    you have enough knowledge to understand the available rooms
+    you can check the room fron the knowledge document
+    thoroughly understand the context {topic} by the user
+    understanding and summerizing the context
+    summerizing the context to conclusion
+    provide direct output without any useless text in it
+    understand and provide to the point solution
+    provide solution for the problem in short
+    example: the bedroom temperature is very hot
+    output: turn on the fan in bedroom
+    
+  expected_output: >
+    an array of room name according to the context
+    input: turn on fan in hall and bedroom
+    output: ["hall","bedroom"]
+    the output is just array and nothing else, no other character
+  agent: location_detector
