@@ -11,6 +11,7 @@ public class IotManager : MonoBehaviour
     [SerializeField] private FridgeController fridgeController;
     [SerializeField] private ACController acController;
     [SerializeField] private WashingMachineController washingMachineController;
+    [SerializeField] private FanController fanController;
 
     public bool tvOn = false;
     [Range(0, 100)] public int tvVolume = 10;
@@ -34,9 +35,12 @@ public class IotManager : MonoBehaviour
     public bool acEcoMode = false;
     
     
-    public bool washingMachineOn = false;               // Toggle in Inspector
+    public bool washingMachineOn = false;
 
-  
+    public bool fanOn = false;
+    public int fanRPM = 400;
+
+
 
 
     /*[System.Serializable]
@@ -128,5 +132,12 @@ public class IotManager : MonoBehaviour
 
         if (washingMachineController != null)
             washingMachineController.ToggleWashingMachine(washingMachineOn);
+
+        if (fanController != null)
+        {
+            fanController.ToggleFan(fanOn);
+            fanController.SetRPM(fanRPM);
+        }
+
     }
 }
