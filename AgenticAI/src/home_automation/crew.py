@@ -14,7 +14,7 @@ from pathlib import Path
 from src.home_automation.tools.summarizer import summarize
 from src.home_automation.tools.array import array_out
 from src.home_automation.tools.room import room_select
-
+from src.home_automation.tools.devices import device_select
 load_dotenv()
 
 # If you want to run a snippet of code before or after the crew starts, 
@@ -55,9 +55,21 @@ class HomeAutomation():
 			verbose=True,
 			memory=True,
 			max_rpm=5000,
-			allow_delegation=False,
+			allow_delegation=True,
 			llm=self.llm,
 			tools=[room_select.list_room],
+		)
+	
+	@agent
+	def device_action(self) -> Agent:
+		return Agent(
+			config=self.agents_config['device_action'],
+			verbose=True,
+			memory=True,
+			max_rpm=5000,
+			allow_delegation=False,
+			llm=self.llm,
+			tools=[device_select.list_device, device_select.output_json],
 		)
 
 	# To learn more about structured task outputs, 
@@ -73,8 +85,17 @@ class HomeAutomation():
 	@task
 	def location_detector_task(self) -> Task:
 		return Task(
+			input=self.home_analyst_task().output,
 			agent=self.location_detector(),
 			config=self.tasks_config['location_detector_task'],
+			context=[self.home_analyst_task()]
+		)
+	
+	@task
+	def device_action_task(self) -> Task:
+		return Task(
+			agent=self.device_action(),
+			config=self.tasks_config['device_action_task'],
 			output_file='report.md',
 			context=[self.home_analyst_task()]
 		)
