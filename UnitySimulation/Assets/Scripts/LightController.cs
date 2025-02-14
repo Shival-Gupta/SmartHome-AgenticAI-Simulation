@@ -1,42 +1,18 @@
-/*using UnityEngine;
-
-public class LightController : MonoBehaviour
-{
-    private Light lightSource;
-
-    private void Awake()
-    {
-        lightSource = GetComponent<Light>();
-    }
-
-    public void SetLightIntensity(float intensity)
-    {
-        if (lightSource != null)
-            lightSource.intensity = intensity;
-    }
-
-    public void SetLightColor(Color color)
-    {
-        if (lightSource != null)
-            lightSource.color = color;
-    }
-
-    public void ToggleLight(bool state)
-    {
-        if (lightSource != null)
-            lightSource.enabled = state;
-    }
-}
-*/
-
 using UnityEngine;
 
 public class LightController : MonoBehaviour
 {
     private Light lightComponent;
+
+    [Tooltip("Turn the light on or off")]
     public bool isOn = true;
+
+    [Range(0f, 2f)]
+    [Tooltip("Adjust the light's intensity")]
     public float intensity = 1.0f;
-    public string hexColor = "#FFFFFF";
+
+    [Tooltip("Select the light's color")]
+    public Color lightColor = Color.white; // Changed from string to Color
 
     private void Awake()
     {
@@ -48,7 +24,15 @@ public class LightController : MonoBehaviour
             return;
         }
 
-        
+        ApplyLightSettings();
+    }
+
+    private void OnValidate()
+    {
+        // This method is called when the script is loaded or a value changes in the inspector
+        if (lightComponent == null)
+            lightComponent = GetComponent<Light>();
+
         ApplyLightSettings();
     }
 
@@ -64,32 +48,20 @@ public class LightController : MonoBehaviour
 
     public void SetLightIntensity(float newIntensity)
     {
-        intensity = Mathf.Clamp(newIntensity, 0f, 2f); 
+        intensity = Mathf.Clamp(newIntensity, 0f, 2f);
         if (lightComponent != null)
         {
             lightComponent.intensity = intensity;
         }
     }
 
-    public void SetHue(string hex)
+    public void SetLightColor(Color color)
     {
-        if (!hex.StartsWith("#"))
+        lightColor = color;
+        if (lightComponent != null)
         {
-            hex = "#" + hex;  
-        }
-
-        if (ColorUtility.TryParseHtmlString(hex, out Color color))
-        {
-            hexColor = hex;
-            if (lightComponent != null)
-            {
-                lightComponent.color = color;
-                Debug.Log($"Light {gameObject.name} color set to {hex}");
-            }
-        }
-        else
-        {
-            Debug.LogError($"Invalid hex color: {hex}. Use format #RRGGBB.");
+            lightComponent.color = color;
+            Debug.Log($"Light {gameObject.name} color set to {ColorUtility.ToHtmlStringRGB(color)}");
         }
     }
 
@@ -97,6 +69,6 @@ public class LightController : MonoBehaviour
     {
         ToggleLight(isOn);
         SetLightIntensity(intensity);
-        SetHue(hexColor);
+        SetLightColor(lightColor);
     }
 }
