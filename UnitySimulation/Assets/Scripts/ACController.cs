@@ -20,7 +20,7 @@ public class ACController : MonoBehaviour
 using UnityEngine;
 using TMPro;
 
-public class ACController : MonoBehaviour
+public class ACController : SmartDevice
 {
     public bool isOn = false;
     public int fanSpeed = 1;
@@ -31,6 +31,12 @@ public class ACController : MonoBehaviour
     [SerializeField] private TMP_Text ACTemperatureText;
     [SerializeField] private TMP_Text ACFanSpeedText;
     [SerializeField] private TMP_Text ACEcoModeText;
+    [SerializeField] private string roomNumberPublic = "Bedroom";
+    protected override void Awake()
+    {
+        base.Awake();
+        SetRoomNumber(roomNumberPublic); // Assign SmartDevice's room number from public variable
+    }
 
     private void Start()
     {

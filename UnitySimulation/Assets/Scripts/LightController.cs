@@ -1,7 +1,9 @@
 using UnityEngine;
 
-public class LightController : MonoBehaviour
+public class LightController : SmartDevice
 {
+    [SerializeField] private string roomNumberPublic = "Living Room";
+    
     private Light lightComponent;
 
     [Tooltip("Turn the light on or off")]
@@ -14,8 +16,10 @@ public class LightController : MonoBehaviour
     [Tooltip("Select the light's color")]
     public Color lightColor = Color.white; // Changed from string to Color
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
+        SetRoomNumber(roomNumberPublic); // Assign SmartDevice's room number from public variable
         lightComponent = GetComponent<Light>();
 
         if (lightComponent == null)

@@ -21,7 +21,7 @@ public class FridgeController : MonoBehaviour
 using UnityEngine;
 using TMPro;
 
-public class FridgeController : MonoBehaviour
+public class FridgeController : SmartDevice
 {
     public bool isOn = false;
     public int mainTemperature = 4;   // Default fridge temp
@@ -34,6 +34,12 @@ public class FridgeController : MonoBehaviour
     [SerializeField] private TMP_Text FreezeTempText;
     [SerializeField] private TMP_Text FridgeDoorStatusText;
     [SerializeField] private TMP_Text FreezeDoorStatusText;
+    [SerializeField] private string roomNumberPublic = "Kitchen";
+    protected override void Awake()
+    {
+        base.Awake();
+        SetRoomNumber(roomNumberPublic); // Assign SmartDevice's room number from public variable
+    }
 
     private void Start()
     {

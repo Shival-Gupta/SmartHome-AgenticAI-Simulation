@@ -1,9 +1,15 @@
 using UnityEngine;
 
-public class WashingMachineController : MonoBehaviour
+public class WashingMachineController : SmartDevice
 {
     [SerializeField] private GameObject onCylinder;  
     [SerializeField] private GameObject offCylinder;
+    [SerializeField] private string roomNumberPublic = "Bathroom";
+    protected override void Awake()
+    {
+        base.Awake();
+        SetRoomNumber(roomNumberPublic); 
+    }
 
     private bool isOn = false;
 
