@@ -1,8 +1,9 @@
 using UnityEngine;
 using TMPro;
 
-public class FanController : MonoBehaviour
+public class FanController : SmartDevice
 {
+    [SerializeField] private string roomNumberPublic = "Living Room";
     public bool isOn = false;   
     public int rpm = 400;       
 
@@ -12,6 +13,11 @@ public class FanController : MonoBehaviour
     private void Start()
     {
         UpdateFanUI();
+    }
+    protected override void Awake()
+    {
+        base.Awake();
+        SetRoomNumber(roomNumberPublic); // Assign SmartDevice's room number from public variable
     }
 
     public void ToggleFan(bool state)

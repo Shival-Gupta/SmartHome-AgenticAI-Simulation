@@ -3,12 +3,14 @@ using UnityEngine.UI;
 using UnityEngine.Video;
 using TMPro;
 
-public class TVController : MonoBehaviour
+public class TVController : SmartDevice
 {
     public bool isOn = false;
     public int volume = 10;
     public int channel = 1;
     public string source = "HDMI1";
+    
+    [SerializeField] private string roomNumberPublic = "Living Room";
 
     [Header("UI References")]
     [SerializeField] private TMP_Text TVStatusText;
@@ -27,7 +29,13 @@ public class TVController : MonoBehaviour
         InitializeVideoPlayer();
         UpdateTVUI();
     }
-
+    
+    protected override void Awake()
+    {
+        base.Awake();
+        SetRoomNumber(roomNumberPublic); // Assign SmartDevice's room number from public variable
+    }
+   
     private void InitializeVideoPlayer()
     {
         if (tvVideoPlayer != null)
