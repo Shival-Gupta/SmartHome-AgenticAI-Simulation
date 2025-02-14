@@ -16,6 +16,7 @@ public class TVController : MonoBehaviour
     [SerializeField] private TMP_Text TVChannelText;
     [SerializeField] private TMP_Text TVSourceText;
     [SerializeField] private Image tvImage;          // For the OFF state
+    [SerializeField] private RawImage tvVideo;          // For the OFF state
     [SerializeField] private Sprite tvOffSprite;     // TV OFF image
 
     [Header("Video Player")]
@@ -92,6 +93,7 @@ public class TVController : MonoBehaviour
         if (tvImage != null)
         {
             tvImage.gameObject.SetActive(!isOn);
+            tvVideo.gameObject.SetActive(isOn);
             tvImage.sprite = tvOffSprite;
         }
 
