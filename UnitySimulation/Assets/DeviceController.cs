@@ -101,7 +101,15 @@ public class DeviceController : MonoBehaviour
 
             controller.ToggleLight(settings.isOn);
             controller.SetLightIntensity(settings.intensity);
-            controller.SetHue(settings.hexColor);
+
+            if (ColorUtility.TryParseHtmlString("#" + settings.hexColor, out Color color))
+            {
+                controller.SetLightColor(color);
+            }
+            else
+            {
+                Debug.LogWarning($"Invalid hex color: {settings.hexColor}");
+            }
         }
     }
 

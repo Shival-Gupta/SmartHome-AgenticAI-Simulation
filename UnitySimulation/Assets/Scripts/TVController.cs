@@ -1,26 +1,6 @@
-/*using UnityEngine;
-using UnityEngine.UI;
-
-public class TVController : MonoBehaviour
-{
-    [SerializeField] private Image tvScreen; 
-    [SerializeField] private Sprite tvOnSprite; // Image when TV is ON
-    [SerializeField] private Sprite tvOffSprite; // Image when TV is OFF
-
-    private bool isOn = false;  // Default TV state is OFF
-
-    public void ToggleTV(bool state)
-    {
-        isOn = state;
-
-        if (tvScreen != null)
-            tvScreen.sprite = isOn ? tvOnSprite : tvOffSprite;
-    }
-}
-*/
-
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Video;
 using TMPro;
 
 public class TVController : MonoBehaviour
@@ -30,38 +10,56 @@ public class TVController : MonoBehaviour
     public int channel = 1;
     public string source = "HDMI1";
 
+    [Header("UI References")]
     [SerializeField] private TMP_Text TVStatusText;
     [SerializeField] private TMP_Text TVVolumeText;
     [SerializeField] private TMP_Text TVChannelText;
     [SerializeField] private TMP_Text TVSourceText;
-    [SerializeField] private Image tvImage;   // Image that will change
-    [SerializeField] private Sprite tvOnSprite;  // TV ON image
-    [SerializeField] private Sprite tvOffSprite; // TV OFF image
+    [SerializeField] private Image tvImage;          // For the OFF state
+    [SerializeField] private Sprite tvOffSprite;     // TV OFF image
+
+    [Header("Video Player")]
+    [SerializeField] private VideoPlayer tvVideoPlayer;
 
     private void Start()
     {
+        InitializeVideoPlayer();
         UpdateTVUI();
+    }
+
+    private void InitializeVideoPlayer()
+    {
+        if (tvVideoPlayer != null)
+        {
+            tvVideoPlayer.playOnAwake = false;
+            tvVideoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
+            tvVideoPlayer.SetDirectAudioVolume(0, volume / 100f);
+        }
     }
 
     public void ToggleTV(bool state)
     {
         isOn = state;
-        Debug.Log($"TV is now {(isOn ? "ON" : "OFF")}");
         UpdateTVUI();
+        Debug.Log($"TV is now {(isOn ? "ON" : "OFF")}");
     }
 
     public void SetVolume(int vol)
     {
         volume = Mathf.Clamp(vol, 0, 100);
-        Debug.Log($"TV volume set to {volume}");
+        if (tvVideoPlayer != null)
+        {
+            tvVideoPlayer.SetDirectAudioVolume(0, volume / 100f);
+        }
         UpdateTVUI();
+        Debug.Log($"TV volume set to {volume}");
     }
 
     public void SetChannel(int ch)
     {
         channel = ch;
-        Debug.Log($"TV channel set to {channel}");
         UpdateTVUI();
+        Debug.Log($"TV channel set to {channel}");
     }
 
     public void SetSource(string newSource)
@@ -69,8 +67,8 @@ public class TVController : MonoBehaviour
         if (newSource == "HDMI1" || newSource == "HDMI2")
         {
             source = newSource;
-            Debug.Log($"TV source set to {source}");
             UpdateTVUI();
+            Debug.Log($"TV source set to {source}");
         }
         else
         {
@@ -80,19 +78,34 @@ public class TVController : MonoBehaviour
 
     private void UpdateTVUI()
     {
+        // Update text displays
         if (TVStatusText != null)
             TVStatusText.text = $"TV: {(isOn ? "ON" : "OFF")}";
-
         if (TVVolumeText != null)
             TVVolumeText.text = $"Volume: {volume}";
-
         if (TVChannelText != null)
             TVChannelText.text = $"Channel: {channel}";
-
         if (TVSourceText != null)
             TVSourceText.text = $"Source: {source}";
 
+        // Update visual state
         if (tvImage != null)
-            tvImage.sprite = isOn ? tvOnSprite : tvOffSprite;
+        {
+            tvImage.gameObject.SetActive(!isOn);
+            tvImage.sprite = tvOffSprite;
+        }
+
+        // Control video playback
+        if (tvVideoPlayer != null)
+        {
+            if (isOn && !tvVideoPlayer.isPlaying)
+            {
+                tvVideoPlayer.Play();
+            }
+            else if (!isOn && tvVideoPlayer.isPlaying)
+            {
+                tvVideoPlayer.Pause();
+            }
+        }
     }
 }
