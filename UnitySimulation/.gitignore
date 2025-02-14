@@ -71,3 +71,7 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+Assets/the_sky_is_on_fire_16k.hdr
+Assets/the_sky_is_on_fire_16k.hdr.meta
+Assets/HDRI/the_sky_is_on_fire_16k.hdr
+Assets/HDRI/the_sky_is_on_fire_16k.hdr.meta

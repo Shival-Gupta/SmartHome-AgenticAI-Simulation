@@ -1,23 +1,3 @@
-/*using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-
-
-public class FridgeController : MonoBehaviour
-{
-    [SerializeField] private TMP_Text fridgeTempText;
-
-    private int currentTemperature = 4; // Default fridge temperature
-
-    public void SetTemperature(int temperature)
-    {
-        currentTemperature = temperature;
-        if (fridgeTempText != null)
-            fridgeTempText.text = "Fridge Temp: " + currentTemperature + "°C";
-    }
-}
-*/
-
 using UnityEngine;
 using TMPro;
 
@@ -56,14 +36,14 @@ public class FridgeController : SmartDevice
     public void SetTemperature(int temp)
     {
         mainTemperature = temp;
-        Debug.Log($"Fridge temperature set to {mainTemperature}°C");
+        Debug.Log($"Fridge temperature set to {mainTemperature}ï¿½C");
         UpdateFridgeUI();
     }
 
     public void SetFreezeTemperature(int temp)
     {
         freezeTemperature = temp;
-        Debug.Log($"Freezer temperature set to {freezeTemperature}°C");
+        Debug.Log($"Freezer temperature set to {freezeTemperature}ï¿½C");
         UpdateFridgeUI();
     }
 
@@ -73,10 +53,10 @@ public class FridgeController : SmartDevice
             FridgeStatusText.text = $"Fridge: {(isOn ? "ON" : "OFF")}";
 
         if (FridgeTempText != null)
-            FridgeTempText.text = $"Main Temp: {mainTemperature}°C";
+            FridgeTempText.text = $"Main Temp: {mainTemperature}ï¿½C";
 
         if (FreezeTempText != null)
-            FreezeTempText.text = $"Freezer Temp: {freezeTemperature}°C";
+            FreezeTempText.text = $"Freezer Temp: {freezeTemperature}ï¿½C";
 
         if (FridgeDoorStatusText != null)
             FridgeDoorStatusText.text = $"Main Door: {(mainDoorOpen ? "Open" : "Shut")}";
