@@ -56,4 +56,4 @@ For specific setup and usage instructions:
 
 ## Contribution
 Guidelines: [CONTRIBUTING.md](./CONTRIBUTING.md)  
-License: [MIT](./LICENSE) *(Note: Add a `LICENSE` file if not present.)*
+License: [MIT](./LICENSE)
