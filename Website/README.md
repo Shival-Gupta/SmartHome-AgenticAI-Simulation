@@ -1,50 +1,75 @@
-# SmartHome-AgenticAI-Simulation Website
+# SmartHome Website
 
-This directory contains the website for interacting with the SmartHome-AgenticAI-Simulation project. The website provides user interfaces to control simulated smart home devices via a WebSocket connection, with options for basic manual control, basic AI integration, and advanced AI-enhanced automation.
+This web interface controls the `SmartHome-AgenticAI-Simulation` with three modes: basic manual controls (v1), AI-assisted controls (v2), and advanced AI integration (v3).
 
-## Overview
-
-- **Landing Page**: `/Website/index.html` - Provides an introduction and a link to the control interfaces.
-- **Control Interfaces**:
-  - `/Website/remote/v1.html` - Basic control interface without AI integration (manual device control).
-  - `/Website/remote/v2.html` - Basic control interface with AI integration (text/voice input for AI commands).
-  - `/Website/remote/v3.html` - Advanced control interface with AI integration (comprehensive device control and AI automation).
-- **Assets**: Styles and scripts shared across the interfaces, located in `/Website/remote/assets/`.
+## Structure
+```
+Website/
+├── index.html          # Landing page
+├── README.md           # This guide
+├── remote/
+│   ├── index.html      # Chooser page
+│   ├── v1.html         # Basic controls (No AI)
+│   ├── v2.html         # AI-assisted controls
+│   ├── v3.html         # Advanced AI controls
+│   └── assets/
+│       ├── style.css   # Shared styles
+│       └── script.js   # WebSocket logic
+└── favicon.ico         # Browser icon
+```
 
 ## Setup
+1. **Run Simulation**: Start `../UnitySimulation/Environment Samsung.exe` (see [UnitySimulation README](../UnitySimulation/README.md)).
+2. **Serve Website**:
+   ```bash
+   cd Website
+   python -m http.server 8000
+   ```
+3. **Open Browser**: Visit [http://localhost:8000](http://localhost:8000).
 
-1. **Run the Unity Simulation**:
-   - Follow instructions in `../UnitySimulation/README.md` to launch the simulation.
-   - Ensure the WebSocket server is running at `ws://localhost:8080/iot`.
+## Interfaces
+| Version       | Path             | Features                  | Devices                     |
+|---------------|------------------|---------------------------|-----------------------------|
+| Basic         | /remote/v1.html  | Manual controls           | Lights, TV, AC, Fan         |
+| AI-Assisted   | /remote/v2.html  | Manual + text/voice AI    | Lights, TV, AC, Fan         |
+| Advanced AI   | /remote/v3.html  | Full control + advanced AI| + Fridge, Induction, Washer |
 
-2. **Serve the Website**:
-   - Navigate to the `/Website` directory.
-   - Use a local web server to serve the files:
-     ```bash
-     python -m http.server 8000
-     ```
-   - Open your browser to `http://localhost:8000/`.
+## Usage
+- **Start**: Go to `/index.html`, then pick an interface at `/remote/index.html`.
+- **v1**: Use buttons/sliders for Lights, TV, AC, Fan.
+- **v2**: Add text or voice commands (e.g., "Turn on TV").
+- **v3**: Control all devices with advanced commands (e.g., "Set AC to 22°C").
 
-3. **Using the Control Interfaces**:
-   - From the landing page, click "Control the Simulation" to access the chooser page.
-   - Select:
-     - "Basic Control (No AI)" for manual device control (`v1.html`).
-     - "Basic Control with AI" for AI-enhanced commands with limited devices (`v2.html`).
-     - "Advanced Control (AI Integrated)" for comprehensive control and AI automation (`v3.html`).
-   - For AI input (in `v2.html` and `v3.html`):
-     - Type a command in the text input and click "Send".
-     - Use the microphone button for voice input (supported in compatible browsers like Chrome, Edge).
+## Core Features
+- **Real-time**: Connects via WebSocket (`ws://localhost:8080/iot`).
+- **Voice**: Works in Chrome/Edge with mic enabled.
+- **Shortcuts**:
+  - `Ctrl+/`: Focus text input
+  - `Alt+V`: Toggle voice input
+  - `Ctrl+R`: Refresh connection
 
-4. **Troubleshooting**:
-   - Ensure the simulation is running and the WebSocket server is accessible.
-   - Check the connection status on the website.
-   - For AI input, ensure AI agents are running as per `../AgenticAI/README.md`.
+**Sample Command** (for developers):
+```javascript
+// Toggle light on (use in remote/assets/script.js)
+sendCommand({ device: "light", action: "toggle", deviceIndex: 0, parameters: { state: true } });
+```
 
-## Dependencies
+## Troubleshooting
+| Issue                | Fix                             |
+|----------------------|---------------------------------|
+| No response          | Ensure simulation is running    |
+| Voice not working    | Use Chrome/Edge, allow mic      |
+| WebSocket errors     | Check `ws://localhost:8080/iot` |
+| Layout issues        | Refresh (`Ctrl+F5`), clear cache|
 
-- A modern web browser supporting HTML5, CSS3, and JavaScript.
-- For voice input: Browser support for the Web Speech API (e.g., Chrome, Edge).
+## Development
+- **Styles**: Edit `style.css`.
+- **Logic**: Update `script.js`.
+- **API**: See [UnitySimulation API](../UnitySimulation/API.md) for WebSocket command details.
+- **Contribute**: Follow [CONTRIBUTING.md](../CONTRIBUTING.md).
 
-## Contributing
-
-See the root `[CONTRIBUTING.md](../CONTRIBUTING.md)` for guidelines on contributing to this project, including website enhancements.
+## Next Steps After Running the Website
+To fully integrate with the `SmartHome-AgenticAI-Simulation` project:
+- **[UnitySimulation README](../UnitySimulation/README.md):** Details on running the 3D simulation that the website controls via WebSocket.
+- **[AgenticAI README](../AgenticAI/README.md):** Guide to setting up AI agents for automated control through the website (v2 and v3 interfaces).
+- **[Root README](../README.md):** Overview and quick start for the entire project.
