@@ -2,8 +2,8 @@ name: Deploy Website to GitHub Pages
 
 on:
   push:
-    branches: ["main"]  # Adjust to your default branch
-  workflow_dispatch:   # Allows manual triggering
+    branches: ["main"]  # Adjust if your default branch is different (e.g., "master")
+  workflow_dispatch:   # Allows manual triggering from the Actions tab
 
 permissions:
   contents: read
