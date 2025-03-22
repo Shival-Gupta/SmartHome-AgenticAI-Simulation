@@ -19,4 +19,17 @@ public class WashingMachineController : SmartDevice
         onCylinder.SetActive(isOn);
         offCylinder.SetActive(!isOn);
     }
+
+    public string[] GetStatusArray()
+    {
+        string[] status =
+        {
+            $"Device ID: {DeviceID}",
+            $"Room: {RoomNumber}",
+            $"Washing Machine: {(isOn ? "ON" : "OFF")}"
+        };
+        return status;
+    }
+
+
 }

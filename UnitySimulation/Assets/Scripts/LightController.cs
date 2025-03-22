@@ -75,4 +75,18 @@ public class LightController : SmartDevice
         SetLightIntensity(intensity);
         SetLightColor(lightColor);
     }
+
+    public string[] GetStatusArray()
+    {
+        string[] status =
+        {
+        $"Device ID: {DeviceID}",
+        $"Room: {RoomNumber}",
+        $"Power: {(isOn ? "ON" : "OFF")}",
+        $"Intensity: {intensity}",
+        $"Color: {ColorUtility.ToHtmlStringRGB(lightColor)}"
+    };
+        return status;
+    }
+
 }

@@ -42,4 +42,17 @@ public class FanController : SmartDevice
         if (FanRPMText != null)
             FanRPMText.text = $"RPM: {rpm}";
     }
+
+    public string[] GetStatusArray()
+    {
+        string[] status =
+        {
+        $"Device ID: {DeviceID}",
+        $"Room: {RoomNumber}",
+        $"Power: {(isOn ? "ON" : "OFF")}",
+        $"RPM: {rpm}"
+    };
+        return status;
+    }
+
 }

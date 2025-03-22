@@ -72,4 +72,19 @@ public class ACController : SmartDevice
         if (ACEcoModeText != null)
             ACEcoModeText.text = $"Eco Mode: {(ecoMode ? "ON" : "OFF")}";
     }
+
+    public string[] GetStatusArray()
+    {
+        string[] status =
+        {
+        $"Device ID: {DeviceID}",
+        $"Room: {RoomNumber}",
+        $"Power: {(isOn ? "ON" : "OFF")}",
+        $"Temperature: {temperature}°C",
+        $"Fan Speed: {fanSpeed}",
+        $"Eco Mode: {(ecoMode ? "ON" : "OFF")}"
+    };
+        return status;
+    }
+
 }

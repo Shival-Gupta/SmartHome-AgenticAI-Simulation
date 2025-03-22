@@ -166,4 +166,61 @@ public class DeviceController : MonoBehaviour
         fanController.SetRPM(fanRPM);
     }
     #endregion
+
+    public void LogAllDeviceStatus()
+    {
+        // Log light statuses:
+        for (int i = 0; i < lightControllers.Length; i++)
+        {
+            if (lightControllers[i] != null)
+            {
+                string[] status = lightControllers[i].GetStatusArray();
+                Debug.Log($"Light {i} Status:\n{string.Join("\n", status)}");
+            }
+        }
+
+        // Log TV status:
+        if (tvController != null)
+        {
+            string[] status = tvController.GetStatusArray();
+            Debug.Log($"TV Status:\n{string.Join("\n", status)}");
+        }
+
+        // Log AC status:
+        if (acController != null)
+        {
+            string[] status = acController.GetStatusArray();
+            Debug.Log($"AC Status:\n{string.Join("\n", status)}");
+        }
+
+        // Log Fridge status:
+        if (fridgeController != null)
+        {
+            string[] status = fridgeController.GetStatusArray();
+            Debug.Log($"Fridge Status:\n{string.Join("\n", status)}");
+        }
+
+        // Log Induction status:
+        if (inductionController != null)
+        {
+            // Assuming you add a GetStatusArray method to InductionController as shown above.
+            string[] status = inductionController.GetStatusArray();
+            Debug.Log($"Induction Status:\n{string.Join("\n", status)}");
+        }
+
+        // Log Washing Machine status:
+        if (washingMachineController != null)
+        {
+            string[] status = washingMachineController.GetStatusArray();
+            Debug.Log($"Washing Machine Status:\n{string.Join("\n", status)}");
+        }
+
+        // Log Fan status:
+        if (fanController != null)
+        {
+            string[] status = fanController.GetStatusArray();
+            Debug.Log($"Fan Status:\n{string.Join("\n", status)}");
+        }
+    }
+
 }

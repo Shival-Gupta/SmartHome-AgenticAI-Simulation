@@ -118,4 +118,20 @@ public class TVController : SmartDevice
             }
         }
     }
+
+    public string[] GetStatusArray()
+    {
+        // Build an array with the desired information.
+        string[] status =
+        {
+        $"Device ID: {DeviceID}",
+        $"Room: {RoomNumber}",
+        $"Power: {(isOn ? "ON" : "OFF")}",
+        $"Volume: {volume}",
+        $"Channel: {channel}",
+        $"Source: {source}"
+    };
+        return status;
+    }
+
 }

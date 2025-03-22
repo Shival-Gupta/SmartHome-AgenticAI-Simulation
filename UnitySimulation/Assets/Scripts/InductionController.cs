@@ -24,4 +24,16 @@ public class InductionController : SmartDevice
                 cylinders[i].SetActive(i < heatLevel);
         }
     }
+
+    public string[] GetStatusArray()
+    {
+        string[] status =
+        {
+        $"Device ID: {DeviceID}",
+        $"Room: {RoomNumber}",
+        $"Heat Level: {heatLevel}"
+    };
+        return status;
+    }
+
 }

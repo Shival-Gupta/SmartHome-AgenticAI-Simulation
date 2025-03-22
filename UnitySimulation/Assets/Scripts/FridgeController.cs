@@ -64,4 +64,20 @@ public class FridgeController : SmartDevice
         if (FreezeDoorStatusText != null)
             FreezeDoorStatusText.text = $"Freezer Door: {(freezeDoorOpen ? "Open" : "Shut")}";
     }
+
+    public string[] GetStatusArray()
+    {
+        string[] status =
+        {
+        $"Device ID: {DeviceID}",
+        $"Room: {RoomNumber}",
+        $"Power: {(isOn ? "ON" : "OFF")}",
+        $"Main Temp: {mainTemperature}°C",
+        $"Freeze Temp: {freezeTemperature}°C",
+        $"Main Door: {(mainDoorOpen ? "Open" : "Shut")}",
+        $"Freezer Door: {(freezeDoorOpen ? "Open" : "Shut")}"
+    };
+        return status;
+    }
+
 }
