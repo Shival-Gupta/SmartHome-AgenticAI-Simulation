@@ -71,23 +71,202 @@ public class DeviceController : MonoBehaviour
     public int fanRPM = 400;
     #endregion
 
+    // Change flags to optimize updates
+    private bool lightsChanged;
+    private bool tvChanged;
+    private bool inductionChanged;
+    private bool fridgeChanged;
+    private bool acChanged;
+    private bool washingMachineChanged;
+    private bool fanChanged;
+
     private void Update()
     {
-        ApplyInspectorChanges();
+        if (lightsChanged)
+        {
+            UpdateLightControllers();
+            lightsChanged = false;
+        }
+        if (tvChanged)
+        {
+            UpdateTVController();
+            tvChanged = false;
+        }
+        if (inductionChanged)
+        {
+            UpdateInductionController();
+            inductionChanged = false;
+        }
+        if (fridgeChanged)
+        {
+            UpdateFridgeController();
+            fridgeChanged = false;
+        }
+        if (acChanged)
+        {
+            UpdateACController();
+            acChanged = false;
+        }
+        if (washingMachineChanged)
+        {
+            UpdateWashingMachineController();
+            washingMachineChanged = false;
+        }
+        if (fanChanged)
+        {
+            UpdateFanController();
+            fanChanged = false;
+        }
     }
 
-    private void ApplyInspectorChanges()
+    private void OnValidate()
     {
-        UpdateLightControllers();
-        UpdateTVController();
-        UpdateInductionController();
-        UpdateFridgeController();
-        UpdateACController();
-        UpdateWashingMachineController();
-        UpdateFanController();
+        // Set flags when values change in the inspector
+        lightsChanged = true;
+        tvChanged = true;
+        inductionChanged = true;
+        fridgeChanged = true;
+        acChanged = true;
+        washingMachineChanged = true;
+        fanChanged = true;
     }
+
+    #region Public Methods for Command Handlers
+
+    public LightSettings GetLightSettings(int index)
+    {
+        if (index < 0 || index >= lightSettings.Count)
+            throw new IndexOutOfRangeException($"Light index {index} out of range.");
+        return lightSettings[index];
+    }
+
+    public void ToggleLight(int index, bool state)
+    {
+        if (index < 0 || index >= lightSettings.Count) return;
+        lightSettings[index].isOn = state;
+        lightsChanged = true;
+    }
+
+    public void SetLightIntensity(int index, float intensity)
+    {
+        if (index < 0 || index >= lightSettings.Count) return;
+        lightSettings[index].intensity = Mathf.Clamp(intensity, 0, 2);
+        lightsChanged = true;
+    }
+
+    public void SetLightColor(int index, string hexColor)
+    {
+        if (index < 0 || index >= lightSettings.Count) return;
+        lightSettings[index].hexColor = hexColor;
+        lightsChanged = true;
+    }
+
+    public void ToggleTV(bool state)
+    {
+        tvOn = state;
+        tvChanged = true;
+    }
+
+    public void SetTVVolume(int volume)
+    {
+        tvVolume = Mathf.Clamp(volume, 0, 100);
+        tvChanged = true;
+    }
+
+    public void SetTVChannel(int channel)
+    {
+        tvChannel = channel;
+        tvChanged = true;
+    }
+
+    public void SetTVSource(string source)
+    {
+        tvSource = source;
+        tvChanged = true;
+    }
+
+    public void SetInductionHeat(int level)
+    {
+        inductionHeat = Mathf.Clamp(level, 0, 3);
+        inductionChanged = true;
+    }
+
+    public void ToggleFridge(bool state)
+    {
+        fridgeOn = state;
+        fridgeChanged = true;
+    }
+
+    public void SetFridgeTemperature(int temp)
+    {
+        fridgeTemperature = Mathf.Clamp(temp, -10, 10);
+        fridgeChanged = true;
+    }
+
+    public void SetFreezeTemperature(int temp)
+    {
+        freezeTemperature = Mathf.Clamp(temp, -30, -10);
+        fridgeChanged = true;
+    }
+
+    public void SetFridgeDoorOpen(bool state)
+    {
+        fridgeDoorOpen = state;
+        fridgeChanged = true;
+    }
+
+    public void SetFreezeDoorOpen(bool state)
+    {
+        freezeDoorOpen = state;
+        fridgeChanged = true;
+    }
+
+    public void ToggleAC(bool state)
+    {
+        acOn = state;
+        acChanged = true;
+    }
+
+    public void SetACTemperature(int temp)
+    {
+        acTemperature = Mathf.Clamp(temp, 16, 30);
+        acChanged = true;
+    }
+
+    public void SetACFanSpeed(int speed)
+    {
+        acFanSpeed = Mathf.Clamp(speed, 0, 3);
+        acChanged = true;
+    }
+
+    public void ToggleACEcoMode(bool state)
+    {
+        acEcoMode = state;
+        acChanged = true;
+    }
+
+    public void ToggleWashingMachine(bool state)
+    {
+        washingMachineOn = state;
+        washingMachineChanged = true;
+    }
+
+    public void ToggleFan(bool state)
+    {
+        fanOn = state;
+        fanChanged = true;
+    }
+
+    public void SetFanRPM(int rpm)
+    {
+        fanRPM = rpm;
+        fanChanged = true;
+    }
+
+    #endregion
 
     #region Controller Update Methods
+
     private void UpdateLightControllers()
     {
         if (lightControllers == null || lightSettings.Count != lightControllers.Length) return;
@@ -165,11 +344,11 @@ public class DeviceController : MonoBehaviour
         fanController.ToggleFan(fanOn);
         fanController.SetRPM(fanRPM);
     }
+
     #endregion
 
     public void LogAllDeviceStatus()
     {
-        // Log light statuses:
         for (int i = 0; i < lightControllers.Length; i++)
         {
             if (lightControllers[i] != null)
@@ -179,48 +358,40 @@ public class DeviceController : MonoBehaviour
             }
         }
 
-        // Log TV status:
         if (tvController != null)
         {
             string[] status = tvController.GetStatusArray();
             Debug.Log($"TV Status:\n{string.Join("\n", status)}");
         }
 
-        // Log AC status:
         if (acController != null)
         {
             string[] status = acController.GetStatusArray();
             Debug.Log($"AC Status:\n{string.Join("\n", status)}");
         }
 
-        // Log Fridge status:
         if (fridgeController != null)
         {
             string[] status = fridgeController.GetStatusArray();
             Debug.Log($"Fridge Status:\n{string.Join("\n", status)}");
         }
 
-        // Log Induction status:
         if (inductionController != null)
         {
-            // Assuming you add a GetStatusArray method to InductionController as shown above.
             string[] status = inductionController.GetStatusArray();
             Debug.Log($"Induction Status:\n{string.Join("\n", status)}");
         }
 
-        // Log Washing Machine status:
         if (washingMachineController != null)
         {
             string[] status = washingMachineController.GetStatusArray();
             Debug.Log($"Washing Machine Status:\n{string.Join("\n", status)}");
         }
 
-        // Log Fan status:
         if (fanController != null)
         {
             string[] status = fanController.GetStatusArray();
             Debug.Log($"Fan Status:\n{string.Join("\n", status)}");
         }
     }
-
 }
