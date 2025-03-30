@@ -1,10 +1,12 @@
 using UnityEngine;
+using System.Linq; // For Concat
 
 public class InductionController : SmartDevice
 {
-    [SerializeField] private GameObject[] cylinders;  
+    [SerializeField] private GameObject[] cylinders;
     [Range(0, 3)] public int heatLevel = 0;  // Intensity from 0 to 3
     [SerializeField] private string roomNumberPublic = "Kitchen";
+
     protected override void Awake()
     {
         base.Awake();
@@ -25,15 +27,13 @@ public class InductionController : SmartDevice
         }
     }
 
-    public string[] GetStatusArray()
+    public override string[] GetStatusArray()
     {
-        string[] status =
+        string[] baseStatus = base.GetStatusArray();
+        string[] inductionStatus = new string[]
         {
-        $"Device ID: {DeviceID}",
-        $"Room: {RoomNumber}",
-        $"Heat Level: {heatLevel}"
-    };
-        return status;
+            $"Heat Level: {heatLevel}"
+        };
+        return baseStatus.Concat(inductionStatus).ToArray();
     }
-
 }

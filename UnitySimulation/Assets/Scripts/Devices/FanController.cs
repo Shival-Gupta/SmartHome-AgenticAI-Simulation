@@ -1,11 +1,12 @@
 using UnityEngine;
 using TMPro;
+using System.Linq; // For Concat
 
 public class FanController : SmartDevice
 {
     [SerializeField] private string roomNumberPublic = "Living Room";
-    public bool isOn = false;   
-    public int rpm = 400;       
+    public bool isOn = false;
+    public int rpm = 400;
 
     [SerializeField] private TMP_Text FanStatusText;
     [SerializeField] private TMP_Text FanRPMText;
@@ -14,6 +15,7 @@ public class FanController : SmartDevice
     {
         UpdateFanUI();
     }
+
     protected override void Awake()
     {
         base.Awake();
@@ -43,16 +45,14 @@ public class FanController : SmartDevice
             FanRPMText.text = $"RPM: {rpm}";
     }
 
-    public string[] GetStatusArray()
+    public override string[] GetStatusArray()
     {
-        string[] status =
+        string[] baseStatus = base.GetStatusArray();
+        string[] fanStatus = new string[]
         {
-        $"Device ID: {DeviceID}",
-        $"Room: {RoomNumber}",
-        $"Power: {(isOn ? "ON" : "OFF")}",
-        $"RPM: {rpm}"
-    };
-        return status;
+            $"Power: {(isOn ? "ON" : "OFF")}",
+            $"RPM: {rpm}"
+        };
+        return baseStatus.Concat(fanStatus).ToArray();
     }
-
 }

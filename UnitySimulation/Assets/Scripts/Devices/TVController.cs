@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
 using TMPro;
+using System.Linq; // For Concat
 
 public class TVController : SmartDevice
 {
@@ -9,7 +10,7 @@ public class TVController : SmartDevice
     public int volume = 10;
     public int channel = 1;
     public string source = "HDMI1";
-    
+
     [SerializeField] private string roomNumberPublic = "Living Room";
 
     [Header("UI References")]
@@ -18,8 +19,8 @@ public class TVController : SmartDevice
     [SerializeField] private TMP_Text TVChannelText;
     [SerializeField] private TMP_Text TVSourceText;
     [SerializeField] private Image tvImage;          // For the OFF state
-    [SerializeField] private RawImage tvVideo;          // For the OFF state
-    [SerializeField] private Sprite tvOffSprite;     // TV OFF image
+    [SerializeField] private RawImage tvVideo;      // For the ON state
+    [SerializeField] private Sprite tvOffSprite;    // TV OFF image
 
     [Header("Video Player")]
     [SerializeField] private VideoPlayer tvVideoPlayer;
@@ -29,13 +30,13 @@ public class TVController : SmartDevice
         InitializeVideoPlayer();
         UpdateTVUI();
     }
-    
+
     protected override void Awake()
     {
         base.Awake();
         SetRoomNumber(roomNumberPublic); // Assign SmartDevice's room number from public variable
     }
-   
+
     private void InitializeVideoPlayer()
     {
         if (tvVideoPlayer != null)
@@ -119,19 +120,16 @@ public class TVController : SmartDevice
         }
     }
 
-    public string[] GetStatusArray()
+    public override string[] GetStatusArray()
     {
-        // Build an array with the desired information.
-        string[] status =
+        string[] baseStatus = base.GetStatusArray();
+        string[] tvStatus = new string[]
         {
-        $"Device ID: {DeviceID}",
-        $"Room: {RoomNumber}",
-        $"Power: {(isOn ? "ON" : "OFF")}",
-        $"Volume: {volume}",
-        $"Channel: {channel}",
-        $"Source: {source}"
-    };
-        return status;
+            $"Power: {(isOn ? "ON" : "OFF")}",
+            $"Volume: {volume}",
+            $"Channel: {channel}",
+            $"Source: {source}"
+        };
+        return baseStatus.Concat(tvStatus).ToArray();
     }
-
 }

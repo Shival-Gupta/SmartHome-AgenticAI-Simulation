@@ -1,17 +1,19 @@
 using UnityEngine;
+using System.Linq; // For Concat
 
 public class WashingMachineController : SmartDevice
 {
-    [SerializeField] private GameObject onCylinder;  
+    [SerializeField] private GameObject onCylinder;
     [SerializeField] private GameObject offCylinder;
     [SerializeField] private string roomNumberPublic = "Bathroom";
+
+    private bool isOn = false;
+
     protected override void Awake()
     {
         base.Awake();
-        SetRoomNumber(roomNumberPublic); 
+        SetRoomNumber(roomNumberPublic);
     }
-
-    private bool isOn = false;
 
     public void ToggleWashingMachine(bool state)
     {
@@ -20,16 +22,13 @@ public class WashingMachineController : SmartDevice
         offCylinder.SetActive(!isOn);
     }
 
-    public string[] GetStatusArray()
+    public override string[] GetStatusArray()
     {
-        string[] status =
+        string[] baseStatus = base.GetStatusArray();
+        string[] washingMachineStatus = new string[]
         {
-            $"Device ID: {DeviceID}",
-            $"Room: {RoomNumber}",
-            $"Washing Machine: {(isOn ? "ON" : "OFF")}"
+            $"Power: {(isOn ? "ON" : "OFF")}" // Changed label to "Power" for consistency
         };
-        return status;
+        return baseStatus.Concat(washingMachineStatus).ToArray();
     }
-
-
 }
