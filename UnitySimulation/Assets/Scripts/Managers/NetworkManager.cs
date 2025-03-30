@@ -6,6 +6,11 @@ using WebSocketSharp;
 using WebSocketSharp.Server;
 using Newtonsoft.Json;
 
+#region Data Models
+
+/// <summary>
+/// Represents a command sent via WebSocket to control an IoT device.
+/// </summary>
 [Serializable]
 public class DeviceCommand
 {
@@ -30,14 +35,21 @@ public class DeviceCommand
     /// <summary>
     /// Gets the action as a specific enum type.
     /// </summary>
-    public T GetAction<T>() where T : Enum
+    /// <typeparam name="T">The enum type corresponding to the device's actions.</typeparam>
+    /// <returns>The parsed action enum.</returns>
+    public T GetAction<T>() where T : struct
     {
+        if (!typeof(T).IsEnum)
+            throw new ArgumentException("T must be an enum type.");
         if (Enum.TryParse(action, true, out T act))
             return act;
         throw new ArgumentException($"Unknown action: {action} for device {device}");
     }
 }
 
+/// <summary>
+/// Represents a response sent back to the WebSocket client.
+/// </summary>
 [Serializable]
 public class WebSocketResponse
 {
@@ -46,7 +58,13 @@ public class WebSocketResponse
     public object data;
 }
 
-// Enums for device types and actions to improve type safety
+#endregion
+
+#region Enums
+
+/// <summary>
+/// Enumerates the supported IoT device types.
+/// </summary>
 public enum DeviceType
 {
     Light,
@@ -58,6 +76,9 @@ public enum DeviceType
     Fan
 }
 
+/// <summary>
+/// Actions available for lights.
+/// </summary>
 public enum LightAction
 {
     Toggle,
@@ -65,6 +86,9 @@ public enum LightAction
     SetColor
 }
 
+/// <summary>
+/// Actions available for TVs.
+/// </summary>
 public enum TVAction
 {
     Toggle,
@@ -73,6 +97,9 @@ public enum TVAction
     SetSource
 }
 
+/// <summary>
+/// Actions available for air conditioners.
+/// </summary>
 public enum ACAction
 {
     Toggle,
@@ -81,6 +108,9 @@ public enum ACAction
     ToggleEco
 }
 
+/// <summary>
+/// Actions available for fridges.
+/// </summary>
 public enum FridgeAction
 {
     Toggle,
@@ -89,27 +119,40 @@ public enum FridgeAction
     SetDoorStatus
 }
 
+/// <summary>
+/// Actions available for induction cooktops.
+/// </summary>
 public enum InductionAction
 {
     SetHeat
 }
 
+/// <summary>
+/// Actions available for washing machines.
+/// </summary>
 public enum WashingMachineAction
 {
     Toggle
 }
 
+/// <summary>
+/// Actions available for fans.
+/// </summary>
 public enum FanAction
 {
     Toggle,
     SetRPM
 }
 
+#endregion
+
 /// <summary>
 /// Manages a WebSocket server to handle IoT device control within a Unity application.
 /// </summary>
 public class NetworkManager : MonoBehaviour
 {
+    #region Fields
+
     private WebSocketServer wssv;
     private DeviceController deviceController;
 
@@ -118,6 +161,10 @@ public class NetworkManager : MonoBehaviour
 
     [SerializeField, Tooltip("If true, starts the WebSocket server automatically when the script awakes.")]
     private bool startServerOnAwake = true;
+
+    #endregion
+
+    #region Unity Lifecycle
 
     private void Awake()
     {
@@ -132,6 +179,19 @@ public class NetworkManager : MonoBehaviour
             StartServer();
     }
 
+    private void OnDestroy()
+    {
+        if (wssv != null && wssv.IsListening)
+        {
+            wssv.Stop();
+            Debug.Log("WebSocket server stopped");
+        }
+    }
+
+    #endregion
+
+    #region Public Methods
+
     /// <summary>
     /// Starts the WebSocket server to listen for IoT device commands.
     /// </summary>
@@ -140,8 +200,9 @@ public class NetworkManager : MonoBehaviour
         try
         {
             wssv = new WebSocketServer(IPAddress.Any, port);
-            wssv.AddWebSocketService<IoTWebSocketService>("/iot",
-                () => new IoTWebSocketService(deviceController));
+#pragma warning disable CS0618 // Suppress obsolete warning
+            wssv.AddWebSocketService<IoTWebSocketService>("/iot", () => new IoTWebSocketService(deviceController));
+#pragma warning restore CS0618
             wssv.Start();
             Debug.Log($"WebSocket server started on port {port}");
         }
@@ -151,18 +212,19 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
-    {
-        if (wssv != null && wssv.IsListening)
-        {
-            wssv.Stop();
-            Debug.Log("WebSocket server stopped");
-        }
-    }
+    #endregion
 }
 
+/// <summary>
+/// Defines the interface for handling device-specific commands.
+/// </summary>
 public interface ICommandHandler
 {
+    /// <summary>
+    /// Handles the given device command and returns a response.
+    /// </summary>
+    /// <param name="command">The command to process.</param>
+    /// <returns>A WebSocketResponse indicating the result.</returns>
     WebSocketResponse Handle(DeviceCommand command);
 }
 
@@ -171,9 +233,19 @@ public interface ICommandHandler
 /// </summary>
 public class IoTWebSocketService : WebSocketBehavior
 {
+    #region Fields
+
     private readonly DeviceController deviceController;
     private readonly Dictionary<DeviceType, ICommandHandler> handlers;
 
+    #endregion
+
+    #region Constructor
+
+    /// <summary>
+    /// Initializes the WebSocket service with a DeviceController and sets up command handlers.
+    /// </summary>
+    /// <param name="controller">The DeviceController instance to use.</param>
     public IoTWebSocketService(DeviceController controller)
     {
         deviceController = controller ?? throw new ArgumentNullException(nameof(controller), "DeviceController cannot be null.");
@@ -188,6 +260,10 @@ public class IoTWebSocketService : WebSocketBehavior
             { DeviceType.Fan, new FanCommandHandler(deviceController) }
         };
     }
+
+    #endregion
+
+    #region WebSocket Events
 
     protected override void OnMessage(MessageEventArgs e)
     {
@@ -211,6 +287,15 @@ public class IoTWebSocketService : WebSocketBehavior
         }
     }
 
+    #endregion
+
+    #region Command Processing
+
+    /// <summary>
+    /// Processes an incoming device command by routing it to the appropriate handler.
+    /// </summary>
+    /// <param name="command">The device command to process.</param>
+    /// <returns>A response indicating the result of the command execution.</returns>
     private WebSocketResponse ProcessCommand(DeviceCommand command)
     {
         if (handlers.TryGetValue(command.DeviceType, out var handler))
@@ -219,10 +304,15 @@ public class IoTWebSocketService : WebSocketBehavior
         }
         return new WebSocketResponse { success = false, message = $"Unknown device: {command.device}" };
     }
+
+    #endregion
 }
 
 #region Command Handlers
 
+/// <summary>
+/// Handles commands for light devices.
+/// </summary>
 public class LightCommandHandler : ICommandHandler
 {
     private readonly DeviceController deviceController;
@@ -267,6 +357,9 @@ public class LightCommandHandler : ICommandHandler
     }
 }
 
+/// <summary>
+/// Handles commands for TV devices.
+/// </summary>
 public class TVCommandHandler : ICommandHandler
 {
     private readonly DeviceController deviceController;
@@ -317,6 +410,9 @@ public class TVCommandHandler : ICommandHandler
     }
 }
 
+/// <summary>
+/// Handles commands for AC devices.
+/// </summary>
 public class ACCommandHandler : ICommandHandler
 {
     private readonly DeviceController deviceController;
@@ -367,6 +463,9 @@ public class ACCommandHandler : ICommandHandler
     }
 }
 
+/// <summary>
+/// Handles commands for fridge devices.
+/// </summary>
 public class FridgeCommandHandler : ICommandHandler
 {
     private readonly DeviceController deviceController;
@@ -420,6 +519,9 @@ public class FridgeCommandHandler : ICommandHandler
     }
 }
 
+/// <summary>
+/// Handles commands for induction cooktops.
+/// </summary>
 public class InductionCommandHandler : ICommandHandler
 {
     private readonly DeviceController deviceController;
@@ -452,6 +554,9 @@ public class InductionCommandHandler : ICommandHandler
     }
 }
 
+/// <summary>
+/// Handles commands for washing machines.
+/// </summary>
 public class WashingMachineCommandHandler : ICommandHandler
 {
     private readonly DeviceController deviceController;
@@ -484,6 +589,9 @@ public class WashingMachineCommandHandler : ICommandHandler
     }
 }
 
+/// <summary>
+/// Handles commands for fans.
+/// </summary>
 public class FanCommandHandler : ICommandHandler
 {
     private readonly DeviceController deviceController;
