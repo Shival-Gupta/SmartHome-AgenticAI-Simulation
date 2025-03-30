@@ -1,9 +1,10 @@
 using UnityEngine;
+using System.Linq; // For Concat
 
 public class LightController : SmartDevice
 {
     [SerializeField] private string roomNumberPublic = "Living Room";
-    
+
     private Light lightComponent;
 
     [Tooltip("Turn the light on or off")]
@@ -33,7 +34,6 @@ public class LightController : SmartDevice
 
     private void OnValidate()
     {
-        // This method is called when the script is loaded or a value changes in the inspector
         if (lightComponent == null)
             lightComponent = GetComponent<Light>();
 
@@ -74,5 +74,17 @@ public class LightController : SmartDevice
         ToggleLight(isOn);
         SetLightIntensity(intensity);
         SetLightColor(lightColor);
+    }
+
+    public override string[] GetStatusArray()
+    {
+        string[] baseStatus = base.GetStatusArray();
+        string[] lightStatus = new string[]
+        {
+            $"Power: {(isOn ? "ON" : "OFF")}",
+            $"Intensity: {intensity}",
+            $"Color: {ColorUtility.ToHtmlStringRGB(lightColor)}"
+        };
+        return baseStatus.Concat(lightStatus).ToArray();
     }
 }

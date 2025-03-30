@@ -4,7 +4,7 @@ using System;
 public class SmartDevice : MonoBehaviour
 {
     [SerializeField, ReadOnly] private string deviceID;   // Unique ID
-    [SerializeField, ReadOnly] private string roomNumber; // Room (assigned from derived class)
+    [SerializeField, ReadOnly] private string roomNumber = "Home"; // Room (assigned from derived class)
 
     public string DeviceID => deviceID;   // Accessible from outside
     public string RoomNumber => roomNumber; // Accessible from outside
@@ -25,5 +25,15 @@ public class SmartDevice : MonoBehaviour
     protected void SetRoomNumber(string room)
     {
         roomNumber = room; // Assign value from derived class
+    }
+
+    // Virtual method to get the base status
+    public virtual string[] GetStatusArray()
+    {
+        return new string[]
+        {
+            $"Device ID: {DeviceID}",
+            $"Room: {RoomNumber}"
+        };
     }
 }

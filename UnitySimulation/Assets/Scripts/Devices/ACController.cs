@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System.Linq; // For Concat
 
 public class ACController : SmartDevice
 {
@@ -13,6 +14,7 @@ public class ACController : SmartDevice
     [SerializeField] private TMP_Text ACFanSpeedText;
     [SerializeField] private TMP_Text ACEcoModeText;
     [SerializeField] private string roomNumberPublic = "Bedroom";
+
     protected override void Awake()
     {
         base.Awake();
@@ -47,7 +49,7 @@ public class ACController : SmartDevice
     public void SetTemperature(int temp)
     {
         temperature = temp;
-        Debug.Log($"AC Temperature set to {temperature}�C");
+        Debug.Log($"AC Temperature set to {temperature}°C");
         UpdateACUI();
     }
 
@@ -62,14 +64,24 @@ public class ACController : SmartDevice
     {
         if (ACStatusText != null)
             ACStatusText.text = $"AC: {(isOn ? "ON" : "OFF")}";
-
         if (ACTemperatureText != null)
-            ACTemperatureText.text = $"Temperature: {temperature}�C";
-
+            ACTemperatureText.text = $"Temperature: {temperature}°C";
         if (ACFanSpeedText != null)
             ACFanSpeedText.text = $"Fan Speed: {fanSpeed}";
-
         if (ACEcoModeText != null)
             ACEcoModeText.text = $"Eco Mode: {(ecoMode ? "ON" : "OFF")}";
+    }
+
+    public override string[] GetStatusArray()
+    {
+        string[] baseStatus = base.GetStatusArray();
+        string[] acStatus = new string[]
+        {
+            $"Power: {(isOn ? "ON" : "OFF")}",
+            $"Temperature: {temperature}°C",
+            $"Fan Speed: {fanSpeed}",
+            $"Eco Mode: {(ecoMode ? "ON" : "OFF")}"
+        };
+        return baseStatus.Concat(acStatus).ToArray();
     }
 }

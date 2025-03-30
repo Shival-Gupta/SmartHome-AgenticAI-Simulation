@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System.Linq; // For Concat
 
 public class FridgeController : SmartDevice
 {
@@ -15,6 +16,7 @@ public class FridgeController : SmartDevice
     [SerializeField] private TMP_Text FridgeDoorStatusText;
     [SerializeField] private TMP_Text FreezeDoorStatusText;
     [SerializeField] private string roomNumberPublic = "Kitchen";
+
     protected override void Awake()
     {
         base.Awake();
@@ -36,14 +38,14 @@ public class FridgeController : SmartDevice
     public void SetTemperature(int temp)
     {
         mainTemperature = temp;
-        Debug.Log($"Fridge temperature set to {mainTemperature}�C");
+        Debug.Log($"Fridge temperature set to {mainTemperature}°C");
         UpdateFridgeUI();
     }
 
     public void SetFreezeTemperature(int temp)
     {
         freezeTemperature = temp;
-        Debug.Log($"Freezer temperature set to {freezeTemperature}�C");
+        Debug.Log($"Freezer temperature set to {freezeTemperature}°C");
         UpdateFridgeUI();
     }
 
@@ -51,17 +53,27 @@ public class FridgeController : SmartDevice
     {
         if (FridgeStatusText != null)
             FridgeStatusText.text = $"Fridge: {(isOn ? "ON" : "OFF")}";
-
         if (FridgeTempText != null)
-            FridgeTempText.text = $"Main Temp: {mainTemperature}�C";
-
+            FridgeTempText.text = $"Main Temp: {mainTemperature}°C";
         if (FreezeTempText != null)
-            FreezeTempText.text = $"Freezer Temp: {freezeTemperature}�C";
-
+            FreezeTempText.text = $"Freezer Temp: {freezeTemperature}°C";
         if (FridgeDoorStatusText != null)
             FridgeDoorStatusText.text = $"Main Door: {(mainDoorOpen ? "Open" : "Shut")}";
-
         if (FreezeDoorStatusText != null)
             FreezeDoorStatusText.text = $"Freezer Door: {(freezeDoorOpen ? "Open" : "Shut")}";
+    }
+
+    public override string[] GetStatusArray()
+    {
+        string[] baseStatus = base.GetStatusArray();
+        string[] fridgeStatus = new string[]
+        {
+            $"Power: {(isOn ? "ON" : "OFF")}",
+            $"Main Temp: {mainTemperature}°C",
+            $"Freeze Temp: {freezeTemperature}°C",
+            $"Main Door: {(mainDoorOpen ? "Open" : "Shut")}",
+            $"Freezer Door: {(freezeDoorOpen ? "Open" : "Shut")}"
+        };
+        return baseStatus.Concat(fridgeStatus).ToArray();
     }
 }
