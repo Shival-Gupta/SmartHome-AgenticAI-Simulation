@@ -265,6 +265,12 @@ public class IoTWebSocketService : WebSocketBehavior
 
     #region WebSocket Events
 
+    protected override void OnOpen()
+    {
+        base.OnOpen();
+        SendInitialState();
+    }
+
     protected override void OnMessage(MessageEventArgs e)
     {
         try
@@ -306,6 +312,92 @@ public class IoTWebSocketService : WebSocketBehavior
     }
 
     #endregion
+
+    #region Helper Function
+
+    private void SendInitialState()
+    {
+        var initialState = new Dictionary<string, object>();
+
+        // Lights
+        var lights = new List<object>();
+        for (int i = 0; i < deviceController.lightSettings.Count; i++)
+        {
+            var settings = deviceController.GetLightSettings(i);
+            lights.Add(new
+            {
+                device = "light",
+                deviceIndex = i,
+                state = settings.isOn,
+                intensity = settings.intensity,
+                color = settings.hexColor
+            });
+        }
+        initialState["lights"] = lights;
+
+        // TV
+        initialState["tv"] = new
+        {
+            device = "tv",
+            state = deviceController.tvOn,
+            volume = deviceController.tvVolume,
+            channel = deviceController.tvChannel,
+            source = deviceController.tvSource
+        };
+
+        // AC
+        initialState["ac"] = new
+        {
+            device = "ac",
+            state = deviceController.acOn,
+            temperature = deviceController.acTemperature,
+            fanSpeed = deviceController.acFanSpeed,
+            ecoMode = deviceController.acEcoMode
+        };
+
+        // Fan
+        initialState["fan"] = new
+        {
+            device = "fan",
+            state = deviceController.fanOn,
+            rpm = deviceController.fanRPM
+        };
+
+        // Fridge
+        initialState["fridge"] = new
+        {
+            device = "fridge",
+            state = deviceController.fridgeOn,
+            temperature = deviceController.fridgeTemperature,
+            freezeTemperature = deviceController.freezeTemperature,
+            fridgeDoor = deviceController.fridgeDoorOpen,
+            freezeDoor = deviceController.freezeDoorOpen
+        };
+
+        // Induction
+        initialState["induction"] = new
+        {
+            device = "induction",
+            level = deviceController.inductionHeat
+        };
+
+        // Washing Machine
+        initialState["washingmachine"] = new
+        {
+            device = "washingmachine",
+            state = deviceController.washingMachineOn
+        };
+
+        var response = new WebSocketResponse
+        {
+            success = true,
+            message = "Initial state",
+            data = initialState
+        };
+        Send(JsonConvert.SerializeObject(response));
+    }
+
+    #endregion
 }
 
 #region Command Handlers
@@ -337,18 +429,31 @@ public class LightCommandHandler : ICommandHandler
                     break;
                 case LightAction.SetIntensity:
                     if (command.parameters == null || !command.parameters.ContainsKey("intensity"))
-                        throw new ArgumentException("Missing 'intensity' parameter for setintensity action.");
+                        throw new ArgumentException("Missing 'intensity' parameter.");
                     float intensity = Convert.ToSingle(command.parameters["intensity"]);
                     deviceController.SetLightIntensity(command.deviceIndex, intensity);
                     break;
                 case LightAction.SetColor:
                     if (command.parameters == null || !command.parameters.ContainsKey("color"))
-                        throw new ArgumentException("Missing 'color' parameter for setcolor action.");
+                        throw new ArgumentException("Missing 'color' parameter.");
                     string hexColor = command.parameters["color"].ToString();
                     deviceController.SetLightColor(command.deviceIndex, hexColor);
                     break;
             }
-            return new WebSocketResponse { success = true, message = "Light command processed successfully." };
+            var settings = deviceController.GetLightSettings(command.deviceIndex);
+            return new WebSocketResponse
+            {
+                success = true,
+                message = "Light command processed successfully.",
+                data = new
+                {
+                    device = "light",
+                    deviceIndex = command.deviceIndex,
+                    state = settings.isOn,
+                    intensity = settings.intensity,
+                    color = settings.hexColor
+                }
+            };
         }
         catch (Exception ex)
         {
@@ -384,24 +489,36 @@ public class TVCommandHandler : ICommandHandler
                     break;
                 case TVAction.SetVolume:
                     if (command.parameters == null || !command.parameters.ContainsKey("volume"))
-                        throw new ArgumentException("Missing 'volume' parameter for setvolume action.");
+                        throw new ArgumentException("Missing 'volume' parameter.");
                     int volume = Convert.ToInt32(command.parameters["volume"]);
                     deviceController.SetTVVolume(volume);
                     break;
                 case TVAction.SetChannel:
                     if (command.parameters == null || !command.parameters.ContainsKey("channel"))
-                        throw new ArgumentException("Missing 'channel' parameter for setchannel action.");
+                        throw new ArgumentException("Missing 'channel' parameter.");
                     int channel = Convert.ToInt32(command.parameters["channel"]);
                     deviceController.SetTVChannel(channel);
                     break;
                 case TVAction.SetSource:
                     if (command.parameters == null || !command.parameters.ContainsKey("source"))
-                        throw new ArgumentException("Missing 'source' parameter for setsource action.");
+                        throw new ArgumentException("Missing 'source' parameter.");
                     string source = command.parameters["source"].ToString();
                     deviceController.SetTVSource(source);
                     break;
             }
-            return new WebSocketResponse { success = true, message = "TV command processed successfully." };
+            return new WebSocketResponse
+            {
+                success = true,
+                message = "TV command processed successfully.",
+                data = new
+                {
+                    device = "tv",
+                    state = deviceController.tvOn,
+                    volume = deviceController.tvVolume,
+                    channel = deviceController.tvChannel,
+                    source = deviceController.tvSource
+                }
+            };
         }
         catch (Exception ex)
         {
@@ -454,7 +571,19 @@ public class ACCommandHandler : ICommandHandler
                     deviceController.ToggleACEcoMode(ecoState);
                     break;
             }
-            return new WebSocketResponse { success = true, message = "AC command processed successfully." };
+            return new WebSocketResponse
+            {
+                success = true,
+                message = "AC command processed successfully.",
+                data = new
+                {
+                    device = "ac",
+                    state = deviceController.acOn,
+                    temperature = deviceController.acTemperature,
+                    fanSpeed = deviceController.acFanSpeed,
+                    ecoMode = deviceController.acEcoMode
+                }
+            };
         }
         catch (Exception ex)
         {
@@ -510,7 +639,20 @@ public class FridgeCommandHandler : ICommandHandler
                     }
                     break;
             }
-            return new WebSocketResponse { success = true, message = "Fridge command processed successfully." };
+            return new WebSocketResponse
+            {
+                success = true,
+                message = "Fridge command processed successfully.",
+                data = new
+                {
+                    device = "fridge",
+                    state = deviceController.fridgeOn,
+                    temperature = deviceController.fridgeTemperature,
+                    freezeTemperature = deviceController.freezeTemperature,
+                    fridgeDoor = deviceController.fridgeDoorOpen,
+                    freezeDoor = deviceController.freezeDoorOpen
+                }
+            };
         }
         catch (Exception ex)
         {
@@ -545,7 +687,16 @@ public class InductionCommandHandler : ICommandHandler
                     deviceController.SetInductionHeat(level);
                     break;
             }
-            return new WebSocketResponse { success = true, message = "Induction command processed successfully." };
+            return new WebSocketResponse
+            {
+                success = true,
+                message = "Induction command processed successfully.",
+                data = new
+                {
+                    device = "induction",
+                    level = deviceController.inductionHeat
+                }
+            };
         }
         catch (Exception ex)
         {
@@ -580,7 +731,16 @@ public class WashingMachineCommandHandler : ICommandHandler
                     deviceController.ToggleWashingMachine(state);
                     break;
             }
-            return new WebSocketResponse { success = true, message = "Washing machine command processed successfully." };
+            return new WebSocketResponse
+            {
+                success = true,
+                message = "Washing machine command processed successfully.",
+                data = new
+                {
+                    device = "washingmachine",
+                    state = deviceController.washingMachineOn
+                }
+            };
         }
         catch (Exception ex)
         {
@@ -621,7 +781,17 @@ public class FanCommandHandler : ICommandHandler
                     deviceController.SetFanRPM(rpm);
                     break;
             }
-            return new WebSocketResponse { success = true, message = "Fan command processed successfully." };
+            return new WebSocketResponse
+            {
+                success = true,
+                message = "Fan command processed successfully.",
+                data = new
+                {
+                    device = "fan",
+                    state = deviceController.fanOn,
+                    rpm = deviceController.fanRPM
+                }
+            };
         }
         catch (Exception ex)
         {
