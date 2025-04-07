@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Linq; // For Concat
+using System.Collections.Generic;
 
 public class ACController : SmartDevice
 {
@@ -70,6 +71,20 @@ public class ACController : SmartDevice
             ACFanSpeedText.text = $"Fan Speed: {fanSpeed}";
         if (ACEcoModeText != null)
             ACEcoModeText.text = $"Eco Mode: {(ecoMode ? "ON" : "OFF")}";
+    }
+
+    public override Dictionary<string, object> GetStatus()
+    {
+        // Get the base status from the parent class
+        Dictionary<string, object> status = base.GetStatus();
+        
+        // Add AC-specific status
+        status["power"] = isOn;
+        status["temperature"] = temperature;
+        status["fanSpeed"] = fanSpeed;
+        status["ecoMode"] = ecoMode;
+        
+        return status;
     }
 
     public override string[] GetStatusArray()

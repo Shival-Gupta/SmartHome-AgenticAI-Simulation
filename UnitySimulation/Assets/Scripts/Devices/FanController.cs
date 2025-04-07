@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Linq; // For Concat
+using System.Collections.Generic;
 
 public class FanController : SmartDevice
 {
@@ -43,6 +44,18 @@ public class FanController : SmartDevice
 
         if (FanRPMText != null)
             FanRPMText.text = $"RPM: {rpm}";
+    }
+
+    public override Dictionary<string, object> GetStatus()
+    {
+        // Get the base status from the parent class
+        Dictionary<string, object> status = base.GetStatus();
+        
+        // Add Fan-specific status
+        status["power"] = isOn;
+        status["rpm"] = rpm;
+        
+        return status;
     }
 
     public override string[] GetStatusArray()

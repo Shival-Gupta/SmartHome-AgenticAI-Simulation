@@ -319,6 +319,79 @@ public class IoTWebSocketService : WebSocketBehavior
     {
         var initialState = new Dictionary<string, object>();
 
+        // Get statuses directly from device controllers
+        try 
+        {
+            // Lights
+            var lights = new List<object>();
+            for (int i = 0; i < deviceController.lightControllers.Length; i++)
+            {
+                if (deviceController.lightControllers[i] != null)
+                {
+                    var lightStatus = deviceController.lightControllers[i].GetStatus();
+                    lightStatus["deviceIndex"] = i;
+                    lights.Add(lightStatus);
+                }
+            }
+            initialState["lights"] = lights;
+
+            // TV
+            if (deviceController.tvController != null)
+            {
+                initialState["tv"] = deviceController.tvController.GetStatus();
+            }
+
+            // AC
+            if (deviceController.acController != null)
+            {
+                initialState["ac"] = deviceController.acController.GetStatus();
+            }
+
+            // Fridge
+            if (deviceController.fridgeController != null)
+            {
+                initialState["fridge"] = deviceController.fridgeController.GetStatus();
+            }
+
+            // Induction
+            if (deviceController.inductionController != null)
+            {
+                initialState["induction"] = deviceController.inductionController.GetStatus();
+            }
+
+            // Washing Machine
+            if (deviceController.washingMachineController != null)
+            {
+                initialState["washingMachine"] = deviceController.washingMachineController.GetStatus();
+            }
+
+            // Fan
+            if (deviceController.fanController != null)
+            {
+                initialState["fan"] = deviceController.fanController.GetStatus();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error sending initial state: {ex.Message}");
+            // Fall back to legacy state methods
+            SendLegacyInitialState();
+            return;
+        }
+
+        var response = new WebSocketResponse
+        {
+            success = true,
+            message = "Initial state",
+            data = initialState
+        };
+        Send(JsonConvert.SerializeObject(response));
+    }
+
+    private void SendLegacyInitialState()
+    {
+        var initialState = new Dictionary<string, object>();
+
         // Lights
         var lights = new List<object>();
         for (int i = 0; i < deviceController.lightSettings.Count; i++)
@@ -355,38 +428,7 @@ public class IoTWebSocketService : WebSocketBehavior
             ecoMode = deviceController.acEcoMode
         };
 
-        // Fan
-        initialState["fan"] = new
-        {
-            device = "fan",
-            state = deviceController.fanOn,
-            rpm = deviceController.fanRPM
-        };
-
-        // Fridge
-        initialState["fridge"] = new
-        {
-            device = "fridge",
-            state = deviceController.fridgeOn,
-            temperature = deviceController.fridgeTemperature,
-            freezeTemperature = deviceController.freezeTemperature,
-            fridgeDoor = deviceController.fridgeDoorOpen,
-            freezeDoor = deviceController.freezeDoorOpen
-        };
-
-        // Induction
-        initialState["induction"] = new
-        {
-            device = "induction",
-            level = deviceController.inductionHeat
-        };
-
-        // Washing Machine
-        initialState["washingmachine"] = new
-        {
-            device = "washingmachine",
-            state = deviceController.washingMachineOn
-        };
+        // Other devices...
 
         var response = new WebSocketResponse
         {
@@ -418,41 +460,61 @@ public class LightCommandHandler : ICommandHandler
     {
         try
         {
+            int lightIndex = command.deviceIndex;
+            if (lightIndex < 0 || lightIndex >= deviceController.lightControllers.Length || deviceController.lightControllers[lightIndex] == null)
+                throw new ArgumentException($"Invalid light index: {lightIndex}");
+
+            var lightController = deviceController.lightControllers[lightIndex];
             var action = command.GetAction<LightAction>();
+            
             switch (action)
             {
                 case LightAction.Toggle:
                     bool state = command.parameters != null && command.parameters.ContainsKey("state")
                         ? Convert.ToBoolean(command.parameters["state"])
-                        : !deviceController.GetLightSettings(command.deviceIndex).isOn;
-                    deviceController.ToggleLight(command.deviceIndex, state);
+                        : !deviceController.lightSettings[lightIndex].isOn;
+                    deviceController.ToggleLight(lightIndex, state);
+                    // Also update the light controller directly for immediate feedback
+                    lightController.ToggleLight(state);
                     break;
                 case LightAction.SetIntensity:
                     if (command.parameters == null || !command.parameters.ContainsKey("intensity"))
-                        throw new ArgumentException("Missing 'intensity' parameter.");
+                        throw new ArgumentException("Missing 'intensity' parameter for setintensity action.");
                     float intensity = Convert.ToSingle(command.parameters["intensity"]);
-                    deviceController.SetLightIntensity(command.deviceIndex, intensity);
+                    deviceController.SetLightIntensity(lightIndex, intensity);
+                    // Also update the light controller directly for immediate feedback
+                    lightController.SetLightIntensity(intensity);
                     break;
                 case LightAction.SetColor:
                     if (command.parameters == null || !command.parameters.ContainsKey("color"))
-                        throw new ArgumentException("Missing 'color' parameter.");
-                    string hexColor = command.parameters["color"].ToString();
-                    deviceController.SetLightColor(command.deviceIndex, hexColor);
+                        throw new ArgumentException("Missing 'color' parameter for setcolor action.");
+                    string colorStr = command.parameters["color"].ToString();
+                    if (!colorStr.StartsWith("#"))
+                        colorStr = "#" + colorStr;
+                    
+                    Color color = Color.white;
+                    if (ColorUtility.TryParseHtmlString(colorStr, out color))
+                    {
+                        deviceController.SetLightColor(lightIndex, colorStr.Replace("#", ""));
+                        // Also update the light controller directly for immediate feedback
+                        lightController.SetLightColor(color);
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"Invalid color format: {colorStr}");
+                    }
                     break;
             }
-            var settings = deviceController.GetLightSettings(command.deviceIndex);
+
+            // Get updated status directly from the light controller
+            Dictionary<string, object> status = lightController.GetStatus();
+            status["deviceIndex"] = lightIndex;
+            
             return new WebSocketResponse
             {
                 success = true,
                 message = "Light command processed successfully.",
-                data = new
-                {
-                    device = "light",
-                    deviceIndex = command.deviceIndex,
-                    state = settings.isOn,
-                    intensity = settings.intensity,
-                    color = settings.hexColor
-                }
+                data = status
             };
         }
         catch (Exception ex)

@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.Video;
 using TMPro;
 using System.Linq; // For Concat
+using System.Collections.Generic;
 
 public class TVController : SmartDevice
 {
@@ -120,6 +121,21 @@ public class TVController : SmartDevice
         }
     }
 
+    public override Dictionary<string, object> GetStatus()
+    {
+        // Get the base status from the parent class
+        Dictionary<string, object> status = base.GetStatus();
+        
+        // Add TV-specific status
+        status["power"] = isOn;
+        status["volume"] = volume;
+        status["channel"] = channel;
+        status["source"] = source;
+        
+        return status;
+    }
+
+    // Maintain backward compatibility
     public override string[] GetStatusArray()
     {
         string[] baseStatus = base.GetStatusArray();

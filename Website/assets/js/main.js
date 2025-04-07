@@ -389,67 +389,133 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Update all devices when receiving initial state
-  function updateAllUI(data) {
-    // Lights
-    if (data.lights && Array.isArray(data.lights)) {
-      data.lights.forEach(light => {
-        updateLightUI(light.deviceIndex, light.state, light.intensity, light.color);
-      });
-    }
-    // TV
-    if (data.tv) {
-      updateTVUI(data.tv.state, data.tv.volume, data.tv.channel, data.tv.source);
-    }
-    // AC
-    if (data.ac) {
-      updateACUI(data.ac.state, data.ac.temperature, data.ac.fanSpeed, data.ac.ecoMode);
-    }
-    // Fan
-    if (data.fan) {
-      updateFanUI(data.fan.state, data.fan.rpm);
-    }
-    // Fridge
-    if (data.fridge) {
-      updateFridgeUI(data.fridge.state, data.fridge.temperature, data.fridge.freezeTemperature,
-        data.fridge.fridgeDoor, data.fridge.freezeDoor);
-    }
-    // Induction
-    if (data.induction) {
-      updateInductionUI(data.induction.level);
-    }
-    // Washing Machine
-    if (data.washingmachine) {
-      updateWashingMachineUI(data.washingmachine.state);
+  // Function to update UI based on server response with new JSON structure
+  function updateUI(data) {
+    console.log('Updating UI with data:', data);
+    
+    // Handle the new JSON-based status structure
+    // Check for the device type in the data
+    const deviceType = data.deviceType ? data.deviceType.toLowerCase() : (data.device || '');
+    
+    switch (deviceType) {
+      case 'light':
+        const lightIndex = data.deviceIndex !== undefined ? data.deviceIndex : 0;
+        updateLightUI(
+          lightIndex, 
+          data.power !== undefined ? data.power : data.state, 
+          data.intensity !== undefined ? data.intensity : 1.0, 
+          data.color || 'FFFFFF'
+        );
+        break;
+      case 'tv':
+        updateTVUI(
+          data.power !== undefined ? data.power : data.state, 
+          data.volume || 0, 
+          data.channel || 1, 
+          data.source || 'TV'
+        );
+        break;
+      case 'ac':
+        updateACUI(
+          data.power !== undefined ? data.power : data.state, 
+          data.temperature || 24, 
+          data.fanSpeed || 1, 
+          data.ecoMode || false
+        );
+        break;
+      case 'fan':
+        updateFanUI(
+          data.power !== undefined ? data.power : data.state, 
+          data.rpm || 400
+        );
+        break;
+      case 'fridge':
+        updateFridgeUI(
+          data.power !== undefined ? data.power : data.state, 
+          data.temperature || 4, 
+          data.freezeTemperature || -18, 
+          data.fridgeDoor || false, 
+          data.freezeDoor || false
+        );
+        break;
+      case 'induction':
+        updateInductionUI(data.level || 0);
+        break;
+      case 'washingmachine':
+      case 'washing machine':
+      case 'washingMachine':
+        updateWashingMachineUI(data.power !== undefined ? data.power : data.state);
+        break;
+      default:
+        console.warn('Unknown device in response:', deviceType, data);
     }
   }
 
-  // Update individual device based on command response
-  function updateUI(data) {
-    switch (data.device) {
-      case 'light':
-        updateLightUI(data.deviceIndex, data.state, data.intensity, data.color);
-        break;
-      case 'tv':
-        updateTVUI(data.state, data.volume, data.channel, data.source);
-        break;
-      case 'ac':
-        updateACUI(data.state, data.temperature, data.fanSpeed, data.ecoMode);
-        break;
-      case 'fan':
-        updateFanUI(data.state, data.rpm);
-        break;
-      case 'fridge':
-        updateFridgeUI(data.state, data.temperature, data.freezeTemperature, data.fridgeDoor, data.freezeDoor);
-        break;
-      case 'induction':
-        updateInductionUI(data.level);
-        break;
-      case 'washingmachine':
-        updateWashingMachineUI(data.state);
-        break;
-      default:
-        console.warn('Unknown device in response:', data.device);
+  // Function to update all UI elements based on initial server state
+  function updateAllUI(data) {
+    console.log('Updating all UI with data:', data);
+
+    // Handle lights
+    if (data.lights && Array.isArray(data.lights)) {
+      data.lights.forEach(light => {
+        const index = light.deviceIndex !== undefined ? light.deviceIndex : 0;
+        updateLightUI(
+          index,
+          light.power !== undefined ? light.power : light.state,
+          light.intensity !== undefined ? light.intensity : 1.0,
+          light.color || 'FFFFFF'
+        );
+      });
+    }
+
+    // Handle TV
+    if (data.tv) {
+      updateTVUI(
+        data.tv.power !== undefined ? data.tv.power : data.tv.state,
+        data.tv.volume || 0,
+        data.tv.channel || 1,
+        data.tv.source || 'TV'
+      );
+    }
+
+    // Handle AC
+    if (data.ac) {
+      updateACUI(
+        data.ac.power !== undefined ? data.ac.power : data.ac.state,
+        data.ac.temperature || 24,
+        data.ac.fanSpeed || 1,
+        data.ac.ecoMode || false
+      );
+    }
+
+    // Handle Fan
+    if (data.fan) {
+      updateFanUI(
+        data.fan.power !== undefined ? data.fan.power : data.fan.state,
+        data.fan.rpm || 400
+      );
+    }
+
+    // Handle Fridge
+    if (data.fridge) {
+      updateFridgeUI(
+        data.fridge.power !== undefined ? data.fridge.power : data.fridge.state,
+        data.fridge.temperature || 4,
+        data.fridge.freezeTemperature || -18,
+        data.fridge.fridgeDoor || false,
+        data.fridge.freezeDoor || false
+      );
+    }
+
+    // Handle Induction
+    if (data.induction) {
+      updateInductionUI(data.induction.level || 0);
+    }
+
+    // Handle Washing Machine
+    if (data.washingMachine || data.washingmachine) {
+      const wm = data.washingMachine || data.washingmachine;
+      updateWashingMachineUI(wm.power !== undefined ? wm.power : wm.state);
     }
   }
 
