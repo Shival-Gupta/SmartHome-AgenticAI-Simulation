@@ -56,6 +56,52 @@ All commands are exchanged as JSON objects over the WebSocket connection. The se
 - **message:** A text message describing the command status.
 - **data:** An object containing the current state of the device. This includes standard properties like `deviceId`, `deviceType`, and `roomNumber`, along with device-specific properties.
 
+### Initial State Response
+
+When a client connects, the server automatically sends an initial state message:
+
+```json
+{
+  "success": true,
+  "message": "Initial state",
+  "data": {
+    "lights": [
+      {
+        "deviceId": "LightController_3A9F",
+        "roomNumber": "Living Room",
+        "deviceType": "Light",
+        "power": false,
+        "intensity": 1.0,
+        "color": "FFFFFF",
+        "deviceIndex": 0
+      },
+      // ... more lights
+    ],
+    "tv": {
+      "deviceId": "TVController_B42E",
+      "roomNumber": "Living Room",
+      "deviceType": "TV",
+      "power": false,
+      "volume": 10,
+      "channel": 1,
+      "source": "HDMI1"
+    },
+    // ... other devices
+  }
+}
+```
+
+### Error Response Format
+
+If an error occurs while processing a command, the server responds with:
+
+```json
+{
+  "success": false,
+  "message": "Error description"
+}
+```
+
 ---
 
 ## Supported Devices and Actions
@@ -324,6 +370,23 @@ All commands are exchanged as JSON objects over the WebSocket connection. The se
       "parameters": { "state": true }
     }
     ```
+  - **Example Response:**
+    ```json
+    {
+      "success": true,
+      "message": "Fridge command processed successfully.",
+      "data": {
+        "deviceId": "FridgeController_E57B",
+        "roomNumber": "Kitchen",
+        "deviceType": "Fridge",
+        "power": true,
+        "temperature": 4,
+        "freezeTemperature": -18,
+        "fridgeDoor": false,
+        "freezeDoor": false
+      }
+    }
+    ```
 
 - **Set Main Temperature**
   - **Action:** `"settemperature"`
@@ -381,6 +444,19 @@ All commands are exchanged as JSON objects over the WebSocket connection. The se
       "parameters": { "level": 2 }
     }
     ```
+  - **Example Response:**
+    ```json
+    {
+      "success": true,
+      "message": "Induction command processed successfully.",
+      "data": {
+        "deviceId": "InductionController_F19C",
+        "roomNumber": "Kitchen",
+        "deviceType": "Induction",
+        "level": 2
+      }
+    }
+    ```
 
 ---
 
@@ -396,6 +472,19 @@ All commands are exchanged as JSON objects over the WebSocket connection. The se
       "device": "washingmachine",
       "action": "toggle",
       "parameters": { "state": true }
+    }
+    ```
+  - **Example Response:**
+    ```json
+    {
+      "success": true,
+      "message": "Washing machine command processed successfully.",
+      "data": {
+        "deviceId": "WashingMachineController_G34D",
+        "roomNumber": "Utility Room",
+        "deviceType": "WashingMachine",
+        "power": true
+      }
     }
     ```
 
@@ -415,29 +504,111 @@ All commands are exchanged as JSON objects over the WebSocket connection. The se
       "parameters": { "input": "Turn on the living room lights" }
     }
     ```
+  - **Example Response:**
+    ```json
+    {
+      "success": true,
+      "message": "Command processed"
+    }
+    ```
 
 ---
 
-## Example Interaction
+## Status Handling
 
-**Request: Toggle Light 1 On**
+All commands return a status object with the following fields:
 
+- `success`: Boolean indicating if the operation completed successfully
+- `message`: String describing the status or error message
+- `data`: Object containing the updated device state (when applicable)
+
+### Status Codes
+
+The `success` field determines whether the operation succeeded:
+- `true`: The command was processed successfully
+- `false`: There was an error processing the command
+
+### Error Handling
+
+Common error messages include:
+- "Missing parameter" - When a required parameter is not provided
+- "Invalid parameter" - When a parameter value is outside its allowed range
+- "Unknown device" - When the specified device doesn't exist
+- "Unknown action" - When the action isn't supported for the specified device
+
+Example error response:
 ```json
 {
-  "device": "light",
-  "action": "toggle",
-  "deviceIndex": 0,
-  "parameters": { "state": true }
+  "success": false,
+  "message": "Missing 'intensity' parameter for setintensity action."
 }
 ```
 
-**Response:**
+---
 
-```json
-{
-  "success": true,
-  "message": "Light command processed"
+## Client Implementation Guide
+
+### Connecting to the WebSocket
+
+```javascript
+const ws = new WebSocket('ws://localhost:8080/iot');
+
+ws.onopen = () => {
+  console.log('Connected to IoT WebSocket');
+};
+
+ws.onclose = () => {
+  console.log('Disconnected from IoT WebSocket');
+};
+
+ws.onerror = (error) => {
+  console.error('WebSocket error:', error);
+};
+
+ws.onmessage = (event) => {
+  try {
+    const response = JSON.parse(event.data);
+    console.log('Received:', response);
+    
+    if (response.message === "Initial state") {
+      // Handle initial state update
+      updateAllDevices(response.data);
+    } else if (response.success && response.data) {
+      // Handle individual device update
+      updateDeviceState(response.data);
+    } else {
+      console.error('Command failed:', response.message);
+    }
+  } catch (e) {
+    console.error('Error parsing message:', e);
+  }
+};
+```
+
+### Sending Commands
+
+```javascript
+function sendCommand(device, action, parameters, deviceIndex = null) {
+  if (ws.readyState === WebSocket.OPEN) {
+    const command = {
+      device: device,
+      action: action,
+      parameters: parameters
+    };
+    
+    if (deviceIndex !== null) {
+      command.deviceIndex = deviceIndex;
+    }
+    
+    ws.send(JSON.stringify(command));
+  } else {
+    console.error('WebSocket is not connected');
+  }
 }
+
+// Example usage:
+sendCommand('light', 'toggle', { state: true }, 0);
+sendCommand('ac', 'settemperature', { temperature: 22 });
 ```
 
 ---
