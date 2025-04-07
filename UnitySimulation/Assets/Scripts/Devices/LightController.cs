@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Linq; // For Concat
+using System.Collections.Generic;
 
 public class LightController : SmartDevice
 {
@@ -76,6 +77,20 @@ public class LightController : SmartDevice
         SetLightColor(lightColor);
     }
 
+    public override Dictionary<string, object> GetStatus()
+    {
+        // Get the base status from the parent class
+        Dictionary<string, object> status = base.GetStatus();
+        
+        // Add light-specific status
+        status["power"] = isOn;
+        status["intensity"] = intensity;
+        status["color"] = ColorUtility.ToHtmlStringRGB(lightColor);
+        
+        return status;
+    }
+
+    // Maintain backward compatibility
     public override string[] GetStatusArray()
     {
         string[] baseStatus = base.GetStatusArray();

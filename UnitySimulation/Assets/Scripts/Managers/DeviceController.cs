@@ -30,25 +30,25 @@ public class DeviceController : MonoBehaviour
 
     [Header("Device Controllers")]
     [SerializeField, Tooltip("Array of light controllers in the scene.")]
-    private LightController[] lightControllers;
+    public LightController[] lightControllers;
 
     [SerializeField, Tooltip("TV controller in the scene.")]
-    private TVController tvController;
+    public TVController tvController;
 
     [SerializeField, Tooltip("Induction cooktop controller in the scene.")]
-    private InductionController inductionController;
+    public InductionController inductionController;
 
     [SerializeField, Tooltip("Fridge controller in the scene.")]
-    private FridgeController fridgeController;
+    public FridgeController fridgeController;
 
     [SerializeField, Tooltip("Air conditioner controller in the scene.")]
-    private ACController acController;
+    public ACController acController;
 
     [SerializeField, Tooltip("Washing machine controller in the scene.")]
-    private WashingMachineController washingMachineController;
+    public WashingMachineController washingMachineController;
 
     [SerializeField, Tooltip("Fan controller in the scene.")]
-    private FanController fanController;
+    public FanController fanController;
 
     #endregion
 
