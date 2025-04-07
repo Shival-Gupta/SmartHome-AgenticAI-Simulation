@@ -56,6 +56,7 @@ public class WebSocketResponse
     public bool success;
     public string message;
     public object data;
+    public string type;
 }
 
 #endregion
@@ -275,6 +276,13 @@ public class IoTWebSocketService : WebSocketBehavior
     {
         try
         {
+            var data = e.Data;
+            if (data == "requestInitialState")
+            {
+                SendInitialState();
+                return;
+            }
+            
             var command = JsonConvert.DeserializeObject<DeviceCommand>(e.Data);
             if (command == null || string.IsNullOrEmpty(command.device) || string.IsNullOrEmpty(command.action))
                 throw new ArgumentException("Invalid command format: device and action are required.");
@@ -306,9 +314,11 @@ public class IoTWebSocketService : WebSocketBehavior
     {
         if (handlers.TryGetValue(command.DeviceType, out var handler))
         {
-            return handler.Handle(command);
+            var response = handler.Handle(command);
+            response.type = "deviceState"; // Add type for client compatibility
+            return response;
         }
-        return new WebSocketResponse { success = false, message = $"Unknown device: {command.device}" };
+        return new WebSocketResponse { success = false, message = $"Unknown device: {command.device}", type = "commandResponse" };
     }
 
     #endregion
@@ -318,72 +328,30 @@ public class IoTWebSocketService : WebSocketBehavior
     private void SendInitialState()
     {
         var initialState = new Dictionary<string, object>();
+        var devices = new List<object>();
 
-        // Get statuses directly from device controllers
-        try 
+        // Get all device controllers
+        var deviceControllers = UnityEngine.Object.FindObjectsOfType<SmartDevice>();
+        
+        foreach (var device in deviceControllers)
         {
-            // Lights
-            var lights = new List<object>();
-            for (int i = 0; i < deviceController.lightControllers.Length; i++)
-            {
-                if (deviceController.lightControllers[i] != null)
-                {
-                    var lightStatus = deviceController.lightControllers[i].GetStatus();
-                    lightStatus["deviceIndex"] = i;
-                    lights.Add(lightStatus);
-                }
-            }
-            initialState["lights"] = lights;
-
-            // TV
-            if (deviceController.tvController != null)
-            {
-                initialState["tv"] = deviceController.tvController.GetStatus();
-            }
-
-            // AC
-            if (deviceController.acController != null)
-            {
-                initialState["ac"] = deviceController.acController.GetStatus();
-            }
-
-            // Fridge
-            if (deviceController.fridgeController != null)
-            {
-                initialState["fridge"] = deviceController.fridgeController.GetStatus();
-            }
-
-            // Induction
-            if (deviceController.inductionController != null)
-            {
-                initialState["induction"] = deviceController.inductionController.GetStatus();
-            }
-
-            // Washing Machine
-            if (deviceController.washingMachineController != null)
-            {
-                initialState["washingMachine"] = deviceController.washingMachineController.GetStatus();
-            }
-
-            // Fan
-            if (deviceController.fanController != null)
-            {
-                initialState["fan"] = deviceController.fanController.GetStatus();
-            }
+            var deviceInfo = device.GetStatus();
+            deviceInfo["location"] = device.RoomNumber;
+            deviceInfo["deviceId"] = device.DeviceID;
+            deviceInfo["deviceType"] = device.GetType().Name.Replace("Controller", "");
+            devices.Add(deviceInfo);
         }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Error sending initial state: {ex.Message}");
-            // Fall back to legacy state methods
-            SendLegacyInitialState();
-            return;
-        }
+
+        initialState["devices"] = devices;
+        initialState["timestamp"] = DateTime.UtcNow.ToString("o");
+        initialState["messageType"] = "initialState";
 
         var response = new WebSocketResponse
         {
             success = true,
             message = "Initial state",
-            data = initialState
+            data = initialState,
+            type = "deviceList"
         };
         Send(JsonConvert.SerializeObject(response));
     }
@@ -514,12 +482,13 @@ public class LightCommandHandler : ICommandHandler
             {
                 success = true,
                 message = "Light command processed successfully.",
-                data = status
+                data = status,
+                type = "deviceState"
             };
         }
         catch (Exception ex)
         {
-            return new WebSocketResponse { success = false, message = $"Light command failed: {ex.Message}" };
+            return new WebSocketResponse { success = false, message = $"Light command failed: {ex.Message}", type = "commandResponse" };
         }
     }
 }

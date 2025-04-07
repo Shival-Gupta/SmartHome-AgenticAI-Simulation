@@ -2300,15 +2300,15 @@ MonoBehaviour:
   fanController: {fileID: 804640707}
   lightSettings:
   - isOn: 1
-    intensity: 1.744
-    hexColor: ff0000
+    intensity: 1
+    hexColor: FFFFFF
   - isOn: 1
-    intensity: 2
+    intensity: 1
     hexColor: FFFFFF
   - isOn: 1
     intensity: 2
     hexColor: FFFFFF
-  - isOn: 0
+  - isOn: 1
     intensity: 0
     hexColor: FFFFFF
   - isOn: 0

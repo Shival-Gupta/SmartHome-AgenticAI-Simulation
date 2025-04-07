@@ -5,7 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- WebSocket Management ---
   let ws;
   const serverUrl = 'ws://localhost:8080/iot'; // Make sure this is correct
-  // const serverUrl = 'ws://0.tcp.in.ngrok.io:11347/iot'; // Example ngrok URL
+  let reconnectAttempts = 0;
+  const maxReconnectAttempts = 10;
+  const reconnectDelay = 3000;
+  let reconnectTimer;
 
   const connectionStatus = document.getElementById('connectionStatus');
 
@@ -14,44 +17,120 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ws.onopen = () => {
       console.log('WebSocket connected');
+      reconnectAttempts = 0; // Reset reconnect attempts on successful connection
       if (connectionStatus) {
         connectionStatus.textContent = 'Connected';
-        connectionStatus.classList.replace('disconnected', 'connected');
+        connectionStatus.className = 'status-connected';
       }
+      // Request initial state - you can remove this if server sends it automatically
+      requestDevices();
     };
 
-    ws.onclose = () => {
-      console.log('WebSocket disconnected. Attempting to reconnect...');
+    ws.onclose = (event) => {
+      console.log('WebSocket disconnected', event);
+      
       if (connectionStatus) {
-        connectionStatus.textContent = 'Disconnected';
-        connectionStatus.classList.replace('connected', 'disconnected');
+        connectionStatus.textContent = 'Disconnected - Attempting to reconnect...';
+        connectionStatus.className = 'status-disconnected';
       }
-      // Implement exponential backoff or limit retries if needed
-      setTimeout(connectWebSocket, 3000); // Reconnect after 3 seconds
+      
+      // Try to reconnect unless the connection was closed cleanly
+      if (reconnectAttempts < maxReconnectAttempts && !event.wasClean) {
+        const delay = reconnectDelay * Math.pow(1.2, reconnectAttempts);
+        console.log(`Attempting to reconnect in ${delay}ms (attempt ${reconnectAttempts + 1}/${maxReconnectAttempts})`);
+        
+        clearTimeout(reconnectTimer);
+        reconnectTimer = setTimeout(() => {
+          reconnectAttempts++;
+          connectWebSocket();
+        }, delay);
+      } else if (reconnectAttempts >= maxReconnectAttempts) {
+        if (connectionStatus) {
+          connectionStatus.textContent = 'Connection failed - Please reload the page';
+        }
+        console.error(`Failed to reconnect after ${maxReconnectAttempts} attempts`);
+      }
     };
 
     ws.onerror = (error) => {
       console.error('WebSocket error:', error);
-      // Optionally update UI to show error
+      // Error handling is done in onclose
     };
 
     ws.onmessage = (event) => {
       try {
         const response = JSON.parse(event.data);
         console.log('Received:', response);
-        if (response.message === "Initial state") {
-          updateAllUI(response.data);
-        } else if (response.success && response.data) {
-          updateUI(response.data);
-        } else {
-          console.error('Command failed:', response.message);
+
+        // Handle any message with data property
+        if (response.data) {
+          if (response.messageType === 'initialState' && Array.isArray(response.data.devices)) {
+            console.log('Received initial state with devices:', response.data.devices);
+            deviceManager.updateDevices(response.data.devices);
+          } else if (response.data.deviceId) {
+            // Individual device update
+            updateDeviceInManager(response.data);
+          } else if (response.data.device) {
+            // Legacy format - convert to new format and update
+            const legacyDevice = response.data;
+            const deviceData = {
+              deviceId: legacyDevice.deviceIndex !== undefined 
+                ? `${legacyDevice.device}_${legacyDevice.deviceIndex}` 
+                : legacyDevice.device,
+              deviceType: legacyDevice.device,
+              power: legacyDevice.state,
+              // Copy all other properties
+              ...legacyDevice
+            };
+            updateDeviceInManager(deviceData);
+          }
         }
       } catch (e) {
-        console.error('Error parsing message:', event.data, e);
+        console.error('Error parsing message:', e, event.data);
       }
     };
   }
 
+  function updateDeviceInManager(deviceData) {
+    // Find the device in the manager's devices array
+    const deviceIndex = deviceManager.devices.findIndex(d => {
+      // Handle different possible ID formats
+      return d.deviceId === deviceData.deviceId || 
+             (d.deviceType === deviceData.deviceType && d.deviceIndex === deviceData.deviceIndex);
+    });
+
+    if (deviceIndex !== -1) {
+      // Update existing device
+      deviceManager.devices[deviceIndex] = {
+        ...deviceManager.devices[deviceIndex],
+        ...deviceData
+      };
+    } else {
+      // Add new device
+      deviceManager.devices.push(deviceData);
+    }
+    
+    // Refresh the UI
+    deviceManager.updateFilters();
+    deviceManager.applyFilters();
+  }
+
+  function requestDevices() {
+    // Request the current device state from the server
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      try {
+        const request = {
+          action: "getDevices"
+        };
+        console.log('Requesting devices:', request);
+        ws.send(JSON.stringify(request));
+      } catch (e) {
+        console.error('Error requesting devices:', e);
+      }
+    }
+  }
+
+  // Make sendCommand available globally for deviceManager
   function sendCommand(command) {
     if (ws && ws.readyState === WebSocket.OPEN) {
       try {
@@ -63,8 +142,42 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } else {
       console.error('WebSocket is not connected. Command not sent:', command);
-      // Optionally alert the user or queue the command
+      // Show a notification to user about connection issue
+      showToast('Please wait for connection to be established before sending commands');
     }
+  }
+
+  // Show toast notification for user feedback
+  function showToast(message, duration = 3000) {
+    // Check if toast container exists, if not create it
+    let toastContainer = document.getElementById('toast-container');
+    
+    if (!toastContainer) {
+      toastContainer = document.createElement('div');
+      toastContainer.id = 'toast-container';
+      document.body.appendChild(toastContainer);
+    }
+    
+    // Create new toast
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerText = message;
+    
+    // Add to container
+    toastContainer.appendChild(toast);
+    
+    // Show with animation
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 10);
+    
+    // Auto remove
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    }, duration);
   }
 
   // --- Chat Input: Text & Voice Handling ---
@@ -624,5 +737,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Initialisation ---
   connectWebSocket(); // Initial connection attempt when DOM is ready
+
+  // Dark mode toggle
+  const themeToggle = document.getElementById('themeToggle');
+  const body = document.body;
+  
+  // Check for saved theme preference
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    body.classList.add('dark-mode');
+    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+  }
+
+  themeToggle.addEventListener('click', () => {
+    body.classList.toggle('dark-mode');
+    const isDarkMode = body.classList.contains('dark-mode');
+    
+    // Update icon
+    themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    
+    // Save preference
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  });
 
 }); // End DOMContentLoaded listener

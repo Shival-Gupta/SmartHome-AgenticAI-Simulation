@@ -1,0 +1,340 @@
+:root {
+    /* Light mode variables */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --accent-color: #007bff;
+    --border-color: #dddddd;
+    --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --status-on: #28a745;
+    --status-off: #dc3545;
+}
+
+.dark-mode {
+    /* Dark mode variables */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --accent-color: #0d6efd;
+    --border-color: #404040;
+    --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --status-on: #28a745;
+    --status-off: #dc3545;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.connection-status {
+    font-size: 0.9em;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.status-connected {
+    background-color: var(--status-on);
+    color: white;
+}
+
+.status-disconnected {
+    background-color: var(--status-off);
+    color: white;
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 1.2em;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.theme-toggle:hover {
+    background-color: var(--bg-secondary);
+}
+
+.filters {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.filter-group label {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+}
+
+.filter-group select {
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    min-width: 150px;
+}
+
+.device-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.device-card {
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.device-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.device-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.device-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.status-on {
+    background-color: var(--status-on);
+    color: white;
+}
+
+.status-off {
+    background-color: var(--status-off);
+    color: white;
+}
+
+.device-info {
+    margin-bottom: 15px;
+}
+
+.device-info p {
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+.device-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.device-controls button {
+    padding: 8px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.device-controls button:hover {
+    background-color: #0056b3;
+}
+
+.device-controls input[type="range"],
+.device-controls input[type="number"],
+.device-controls select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.chat-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.chat-input {
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.chat-input button {
+    padding: 10px 20px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.chat-input button:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .filters {
+        flex-direction: column;
+    }
+    
+    .filter-group select {
+        width: 100%;
+    }
+    
+    .device-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Add additional control group styling */
+.control-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 8px;
+}
+
+.control-group label {
+    min-width: 80px;
+    font-size: 0.85em;
+    color: var(--text-secondary);
+}
+
+/* Style for when no devices are found */
+.no-devices {
+    padding: 30px;
+    text-align: center;
+    color: var(--text-secondary);
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px dashed var(--border-color);
+    font-size: 1.1em;
+}
+
+/* Additional button state classes */
+.device-controls button.on {
+    background-color: var(--status-on);
+}
+
+.device-controls button.off {
+    background-color: var(--status-off);
+}
+
+/* Dark mode specific overrides */
+.dark-mode .device-card {
+    border: 1px solid var(--border-color);
+}
+
+.dark-mode input, 
+.dark-mode select {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.dark-mode .device-controls button:hover {
+    background-color: #2980b9;
+}
+
+/* Fix for inline inputs and labels */
+.device-controls input[type="range"] {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Toast notification */
+#toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s, transform 0.3s;
+    max-width: 300px;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dark-mode .toast {
+    background-color: rgba(255, 255, 255, 0.8);
+    color: black;
+} 
