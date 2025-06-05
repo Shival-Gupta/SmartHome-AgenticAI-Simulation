@@ -747,6 +747,39 @@ Transform:
   - {fileID: 1611341580}
   m_Father: {fileID: 6252811883624005755}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &352494364
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 352494365}
+  m_Layer: 0
+  m_Name: IOT
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &352494365
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 352494364}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 794320714}
+  - {fileID: 804640703}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &382737140
 GameObject:
   m_ObjectHideFlags: 0
@@ -2103,6 +2136,103 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 784099193}
   m_CullTransparentMesh: 1
+--- !u!1 &794320713
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 794320714}
+  - component: {fileID: 794320715}
+  m_Layer: 0
+  m_Name: DeviceController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &794320714
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 794320713}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 352494365}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &794320715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 794320713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b977a1f471d76f428471d34f65ebffd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lightControllers:
+  - {fileID: 9088302887155089148}
+  - {fileID: 4970549498235367890}
+  - {fileID: 8636327157634288976}
+  - {fileID: 9042060613783839260}
+  - {fileID: 4824188301697667983}
+  - {fileID: 7767646819801395843}
+  - {fileID: 7047775167362729348}
+  tvController: {fileID: 804640702}
+  inductionController: {fileID: 804640701}
+  fridgeController: {fileID: 804640705}
+  acController: {fileID: 804640706}
+  washingMachineController: {fileID: 804640704}
+  fanController: {fileID: 804640707}
+  lightSettings:
+  - isOn: 1
+    intensity: 1.744
+    hexColor: ff0000
+  - isOn: 1
+    intensity: 2
+    hexColor: FFFFFF
+  - isOn: 1
+    intensity: 2
+    hexColor: FFFFFF
+  - isOn: 0
+    intensity: 0
+    hexColor: FFFFFF
+  - isOn: 0
+    intensity: 0
+    hexColor: FFFFFF
+  - isOn: 0
+    intensity: 0
+    hexColor: FFFFFF
+  - isOn: 0
+    intensity: 0
+    hexColor: FFFFFF
+  tvOn: 1
+  tvVolume: 3
+  tvChannel: 1
+  tvSource: HDMI1
+  inductionHeat: 0
+  fridgeOn: 0
+  fridgeTemperature: 4
+  freezeTemperature: -18
+  fridgeDoorOpen: 0
+  freezeDoorOpen: 0
+  acTemperature: 25
+  acFanSpeed: 1
+  acOn: 0
+  acEcoMode: 0
+  washingMachineOn: 0
+  fanOn: 0
+  fanRPM: 400
 --- !u!1 &804640700
 GameObject:
   m_ObjectHideFlags: 0
@@ -2112,7 +2242,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 804640703}
-  - component: {fileID: 804640708}
   - component: {fileID: 804640702}
   - component: {fileID: 804640701}
   - component: {fileID: 804640705}
@@ -2120,7 +2249,7 @@ GameObject:
   - component: {fileID: 804640706}
   - component: {fileID: 804640707}
   m_Layer: 0
-  m_Name: DeviceManager
+  m_Name: Devices
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2186,7 +2315,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 352494365}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &804640704
 MonoBehaviour:
@@ -2272,71 +2401,6 @@ MonoBehaviour:
   rpm: 400
   FanStatusText: {fileID: 669635701}
   FanRPMText: {fileID: 923132201}
---- !u!114 &804640708
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 804640700}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b977a1f471d76f428471d34f65ebffd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lightControllers:
-  - {fileID: 9088302887155089148}
-  - {fileID: 4970549498235367890}
-  - {fileID: 8636327157634288976}
-  - {fileID: 9042060613783839260}
-  - {fileID: 4824188301697667983}
-  - {fileID: 7767646819801395843}
-  - {fileID: 7047775167362729348}
-  tvController: {fileID: 804640702}
-  inductionController: {fileID: 804640701}
-  fridgeController: {fileID: 804640705}
-  acController: {fileID: 804640706}
-  washingMachineController: {fileID: 804640704}
-  fanController: {fileID: 804640707}
-  lightSettings:
-  - isOn: 1
-    intensity: 1.744
-    hexColor: ff0000
-  - isOn: 1
-    intensity: 2
-    hexColor: FFFFFF
-  - isOn: 1
-    intensity: 2
-    hexColor: FFFFFF
-  - isOn: 0
-    intensity: 0
-    hexColor: FFFFFF
-  - isOn: 0
-    intensity: 0
-    hexColor: FFFFFF
-  - isOn: 0
-    intensity: 0
-    hexColor: FFFFFF
-  - isOn: 0
-    intensity: 0
-    hexColor: FFFFFF
-  tvOn: 1
-  tvVolume: 3
-  tvChannel: 1
-  tvSource: HDMI1
-  inductionHeat: 0
-  fridgeOn: 0
-  fridgeTemperature: 4
-  freezeTemperature: -18
-  fridgeDoorOpen: 0
-  freezeDoorOpen: 0
-  acTemperature: 25
-  acFanSpeed: 1
-  acOn: 0
-  acEcoMode: 0
-  washingMachineOn: 0
-  fanOn: 0
-  fanRPM: 400
 --- !u!1 &902690520
 GameObject:
   m_ObjectHideFlags: 0
@@ -7632,6 +7696,27 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6856996729827276440}
   m_Mesh: {fileID: 4300004, guid: 013043932069e224e90b516d38cdab48, type: 3}
+--- !u!65 &325563530391743326
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4629237847142531131}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.03613397, y: 0.9132023, z: 0.86681116}
+  m_Center: {x: -0.018066062, y: 0.00000010430813, z: 0.43137312}
 --- !u!23 &325911169736106108
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -86076,6 +86161,7 @@ GameObject:
   - component: {fileID: 3235178893045165721}
   - component: {fileID: 6844195626727930789}
   - component: {fileID: 6560760848834999571}
+  - component: {fileID: 325563530391743326}
   - component: {fileID: 2393199271740433248}
   - component: {fileID: 4586593844713750410}
   m_Layer: 0
@@ -95284,6 +95370,7 @@ GameObject:
   - component: {fileID: 9088302887155089146}
   - component: {fileID: 4145044599884285465}
   - component: {fileID: 9088302887155089148}
+  - component: {fileID: 9088302887155089147}
   m_Layer: 0
   m_Name: Point Light (2)
   m_TagString: Untagged
@@ -116883,6 +116970,7 @@ GameObject:
   - component: {fileID: 1557101665522024704}
   - component: {fileID: 5680832676125131212}
   - component: {fileID: 8659323256577373165}
+  - component: {fileID: 8659323256577373166}
   m_Layer: 0
   m_Name: Range_Hood
   m_TagString: Untagged
@@ -120258,6 +120346,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.78526455, y: 0.21503429, z: 1.1198168}
   m_Center: {x: 0.10691565, y: -0.10751694, z: 0.00000008940697}
+--- !u!114 &8659323256577373166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8291540397949961748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f93fcc1c8fd7efc4682bbb76604fe615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &8662271450834263591
 Transform:
   m_ObjectHideFlags: 0
@@ -123626,6 +123726,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 296705568630500658}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9088302887155089147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5744795924490899892}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf8941593abeaa5488ddb3b11f754cd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &9088302887155089148
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124880,5 +124992,5 @@ SceneRoots:
   - {fileID: 559956969}
   - {fileID: 1068209808}
   - {fileID: 5951168555700639897}
-  - {fileID: 804640703}
+  - {fileID: 352494365}
   - {fileID: 1022862198}

@@ -18,7 +18,7 @@ All commands are exchanged as JSON objects over the WebSocket connection. The se
 {
   "device": "device_type",
   "action": "action_name",
-  "deviceIndex": optional_integer,  // Only needed for devices with multiple instances (e.g., lights)
+  "deviceIndex": optional_integer,  // Only needed for devices with multiple instances (e.g., lights) (there are total 6 lights(0-5), 0 and 1 are in hall, 2 is in kitchen, rest are in rooms)
   "parameters": { /* action-specific parameters */ }
 }
 ```
@@ -35,6 +35,72 @@ All commands are exchanged as JSON objects over the WebSocket connection. The se
 - **action:** The specific command to execute (see the sections below).
 - **deviceIndex:** *(Optional)* The index of the device instance (e.g., `0` for Light 1, `1` for Light 2).
 - **parameters:** An object containing any parameters required by the command.
+
+### Response Format
+
+```json
+{
+  "success": boolean,
+  "message": "status message",
+  "data": {
+    "deviceId": "unique_device_id",
+    "deviceType": "device_type",
+    "roomNumber": "room_name",
+    "power": boolean,           // Most devices have this (ON/OFF status)
+    ... // other device-specific properties
+  }
+}
+```
+
+- **success:** Boolean indicating whether the command was processed successfully.
+- **message:** A text message describing the command status.
+- **data:** An object containing the current state of the device. This includes standard properties like `deviceId`, `deviceType`, and `roomNumber`, along with device-specific properties.
+
+### Initial State Response
+
+When a client connects, the server automatically sends an initial state message:
+
+```json
+{
+  "success": true,
+  "message": "Initial state",
+  "data": {
+    "lights": [
+      {
+        "deviceId": "LightController_3A9F",
+        "roomNumber": "Living Room",
+        "deviceType": "Light",
+        "power": false,
+        "intensity": 1.0,
+        "color": "FFFFFF",
+        "deviceIndex": 0
+      },
+      // ... more lights
+    ],
+    "tv": {
+      "deviceId": "TVController_B42E",
+      "roomNumber": "Living Room",
+      "deviceType": "TV",
+      "power": false,
+      "volume": 10,
+      "channel": 1,
+      "source": "HDMI1"
+    },
+    // ... other devices
+  }
+}
+```
+
+### Error Response Format
+
+If an error occurs while processing a command, the server responds with:
+
+```json
+{
+  "success": false,
+  "message": "Error description"
+}
+```
 
 ---
 
@@ -53,6 +119,22 @@ All commands are exchanged as JSON objects over the WebSocket connection. The se
       "action": "toggle",
       "deviceIndex": 0,
       "parameters": { "state": true }
+    }
+    ```
+  - **Example Response:**
+    ```json
+    {
+      "success": true,
+      "message": "Light command processed successfully.",
+      "data": {
+        "deviceId": "LightController_3A9F",
+        "roomNumber": "Living Room",
+        "deviceType": "Light",
+        "power": true,
+        "intensity": 1.5,
+        "color": "FFAA00",
+        "deviceIndex": 0
+      }
     }
     ```
 
@@ -98,6 +180,22 @@ All commands are exchanged as JSON objects over the WebSocket connection. The se
       "device": "tv",
       "action": "toggle",
       "parameters": { "state": true }
+    }
+    ```
+  - **Example Response:**
+    ```json
+    {
+      "success": true,
+      "message": "TV command processed successfully.",
+      "data": {
+        "deviceId": "TVController_B42E",
+        "roomNumber": "Living Room",
+        "deviceType": "TV",
+        "power": true,
+        "volume": 25,
+        "channel": 5,
+        "source": "HDMI1"
+      }
     }
     ```
 
@@ -156,6 +254,22 @@ All commands are exchanged as JSON objects over the WebSocket connection. The se
       "parameters": { "state": true }
     }
     ```
+  - **Example Response:**
+    ```json
+    {
+      "success": true,
+      "message": "AC command processed successfully.",
+      "data": {
+        "deviceId": "ACController_C72D",
+        "roomNumber": "Bedroom",
+        "deviceType": "AC",
+        "power": true,
+        "temperature": 22,
+        "fanSpeed": 2,
+        "ecoMode": false
+      }
+    }
+    ```
 
 - **Set Temperature**
   - **Action:** `"settemperature"`
@@ -212,6 +326,20 @@ All commands are exchanged as JSON objects over the WebSocket connection. The se
       "parameters": { "state": true }
     }
     ```
+  - **Example Response:**
+    ```json
+    {
+      "success": true,
+      "message": "Fan command processed successfully.",
+      "data": {
+        "deviceId": "FanController_D81F",
+        "roomNumber": "Living Room",
+        "deviceType": "Fan",
+        "power": true,
+        "rpm": 1200
+      }
+    }
+    ```
 
 - **Set RPM**
   - **Action:** `"setrpm"`
@@ -240,6 +368,23 @@ All commands are exchanged as JSON objects over the WebSocket connection. The se
       "device": "fridge",
       "action": "toggle",
       "parameters": { "state": true }
+    }
+    ```
+  - **Example Response:**
+    ```json
+    {
+      "success": true,
+      "message": "Fridge command processed successfully.",
+      "data": {
+        "deviceId": "FridgeController_E57B",
+        "roomNumber": "Kitchen",
+        "deviceType": "Fridge",
+        "power": true,
+        "temperature": 4,
+        "freezeTemperature": -18,
+        "fridgeDoor": false,
+        "freezeDoor": false
+      }
     }
     ```
 
@@ -299,6 +444,19 @@ All commands are exchanged as JSON objects over the WebSocket connection. The se
       "parameters": { "level": 2 }
     }
     ```
+  - **Example Response:**
+    ```json
+    {
+      "success": true,
+      "message": "Induction command processed successfully.",
+      "data": {
+        "deviceId": "InductionController_F19C",
+        "roomNumber": "Kitchen",
+        "deviceType": "Induction",
+        "level": 2
+      }
+    }
+    ```
 
 ---
 
@@ -314,6 +472,19 @@ All commands are exchanged as JSON objects over the WebSocket connection. The se
       "device": "washingmachine",
       "action": "toggle",
       "parameters": { "state": true }
+    }
+    ```
+  - **Example Response:**
+    ```json
+    {
+      "success": true,
+      "message": "Washing machine command processed successfully.",
+      "data": {
+        "deviceId": "WashingMachineController_G34D",
+        "roomNumber": "Utility Room",
+        "deviceType": "WashingMachine",
+        "power": true
+      }
     }
     ```
 
@@ -333,47 +504,111 @@ All commands are exchanged as JSON objects over the WebSocket connection. The se
       "parameters": { "input": "Turn on the living room lights" }
     }
     ```
+  - **Example Response:**
+    ```json
+    {
+      "success": true,
+      "message": "Command processed"
+    }
+    ```
 
 ---
 
-## Response Format
+## Status Handling
 
-After processing a command, the server returns a JSON response in the following structure:
+All commands return a status object with the following fields:
 
+- `success`: Boolean indicating if the operation completed successfully
+- `message`: String describing the status or error message
+- `data`: Object containing the updated device state (when applicable)
+
+### Status Codes
+
+The `success` field determines whether the operation succeeded:
+- `true`: The command was processed successfully
+- `false`: There was an error processing the command
+
+### Error Handling
+
+Common error messages include:
+- "Missing parameter" - When a required parameter is not provided
+- "Invalid parameter" - When a parameter value is outside its allowed range
+- "Unknown device" - When the specified device doesn't exist
+- "Unknown action" - When the action isn't supported for the specified device
+
+Example error response:
 ```json
 {
-  "success": true,
-  "message": "Descriptive message",
-  "data": null
+  "success": false,
+  "message": "Missing 'intensity' parameter for setintensity action."
 }
 ```
-
-- **success:** Boolean indicating whether the command was successfully processed.
-- **message:** A descriptive message about the outcome.
-- **data:** *(Optional)* Additional data relevant to the command.
 
 ---
 
-## Example Interaction
+## Client Implementation Guide
 
-**Request: Toggle Light 1 On**
+### Connecting to the WebSocket
 
-```json
-{
-  "device": "light",
-  "action": "toggle",
-  "deviceIndex": 0,
-  "parameters": { "state": true }
-}
+```javascript
+const ws = new WebSocket('ws://localhost:8080/iot');
+
+ws.onopen = () => {
+  console.log('Connected to IoT WebSocket');
+};
+
+ws.onclose = () => {
+  console.log('Disconnected from IoT WebSocket');
+};
+
+ws.onerror = (error) => {
+  console.error('WebSocket error:', error);
+};
+
+ws.onmessage = (event) => {
+  try {
+    const response = JSON.parse(event.data);
+    console.log('Received:', response);
+    
+    if (response.message === "Initial state") {
+      // Handle initial state update
+      updateAllDevices(response.data);
+    } else if (response.success && response.data) {
+      // Handle individual device update
+      updateDeviceState(response.data);
+    } else {
+      console.error('Command failed:', response.message);
+    }
+  } catch (e) {
+    console.error('Error parsing message:', e);
+  }
+};
 ```
 
-**Response:**
+### Sending Commands
 
-```json
-{
-  "success": true,
-  "message": "Light command processed"
+```javascript
+function sendCommand(device, action, parameters, deviceIndex = null) {
+  if (ws.readyState === WebSocket.OPEN) {
+    const command = {
+      device: device,
+      action: action,
+      parameters: parameters
+    };
+    
+    if (deviceIndex !== null) {
+      command.deviceIndex = deviceIndex;
+    }
+    
+    ws.send(JSON.stringify(command));
+  } else {
+    console.error('WebSocket is not connected');
+  }
 }
+
+// Example usage:
+sendCommand('light', 'toggle', { state: true }, 0);
+sendCommand('ac', 'settemperature', { temperature: 22 });
 ```
 
 ---
