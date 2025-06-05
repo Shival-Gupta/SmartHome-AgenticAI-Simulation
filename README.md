@@ -1,5 +1,4 @@
-# VITC_24LAI09VITC_GenAI_for_Context_Aware_Smart_Home_Intelligence
-**SRIB-PRISM Program**
+# SmartHome-AgenticAI-Simulation
 
 ## Demo Video
 Watch the system in action:
