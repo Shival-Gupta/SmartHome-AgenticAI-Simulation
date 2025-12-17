@@ -1,14 +1,140 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <title>SmartHome-AgenticAI-Simulation</title>
-  <link rel="icon" href="favicon.ico">
+  <meta charset="UTF-8" />
+  <title>Smart Home Agentic AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="assets/favicon.ico" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="assets/css/style.css" />
 </head>
+
 <body>
-  <h1>Welcome to SmartHome-AgenticAI-Simulation</h1>
-  <p>A Unity-based smart home simulation with optional AI automation.</p>
-  <p><a href="remote/index.html">Control the Simulation</a></p>
-  <p>See <a href="README.md">README</a> for instructions.</p>
+
+<nav>
+  <div class="brand">Smart Home <span class="accent-text">AI</span></div>
+  <div class="nav-links">
+      <a href="https://github.com/Shival-Gupta/SmartHome-AgenticAI-Simulation" target="_blank" rel="noopener">GitHub ↗</a>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">◐</button>
+  </div>
+</nav>
+
+<main>
+
+  <section class="hero">
+    <div class="version-badge">New: Development Build v0.2</div>
+    <h1>Experience the Future of <br><span class="gradient-text">Agentic Home Automation</span></h1>
+    <p class="subtitle">
+      A high-fidelity Unity simulation powered by Large Language Models. <br>
+      Orchestrate your smart home using natural language or manual overrides.
+    </p>
+    
+    <div class="cta-group">
+      <a href="#setup" class="btn btn-primary">
+        Try Now ⬇
+      </a>
+    </div>
+    
+    <div class="status-indicator">
+      <span class="dot">●</span> Requires "Environment Samsung.exe" running
+    </div>
+  </section>
+
+  <section class="demo-showcase">
+    <div class="video-frame">
+      <iframe
+        src="https://www.youtube.com/embed/f703A_g5J04"
+        title="SmartHome Agentic AI Demo"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </section>
+
+  <section class="features-grid">
+    <div class="feature-card">
+      <h3>Unity Environment</h3>
+      <p>Full 3D physics-based simulation of a modern smart home, providing a visual twin for AI operations.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Real-time State Sync</h3>
+      <p>Bi-directional WebSocket communication allows instant device state retrieval and control updates.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Hybrid Architecture</h3>
+      <p>Seamlessly switch between automated AI agents (CrewAI) and manual user overrides via HTTP.</p>
+    </div>
+  </section>
+
+  <section class="setup-guide" id="setup">
+    <h2>Installation & Setup</h2>
+    
+    <div class="steps-container">
+      
+      <a href="https://github.com/Shival-Gupta/SmartHome-AgenticAI-Simulation/releases/download/v0.2/HomeSimulation_v0.2_Win64.zip" class="step-card action-step">
+        <div class="step-badge">1</div>
+        <div class="step-content">
+          <h3>Download Simulator</h3>
+          <p class="meta-text">For Windows 64-bit (zip) • v0.2 </p>
+        </div>
+      </a>
+
+      <div class="step-card">
+        <div class="step-badge">2</div>
+        <div class="step-content">
+          <h3>Launch Environment</h3>
+          <p class="sub-text">Extract zip and run the executable:
+          <b>"Environment Samsung.exe"</b></p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-badge">3</div>
+        <div class="step-content">
+          <h3>Initialize AI Agents <span class="tag-optional">Required for AI Control</span></h3>
+          <p class="sub-text">In your terminal, start the CrewAI framework:
+          <code class="cmd-block">crewai run</code></p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-badge">4</div>
+        <div class="step-content">
+          <h3>Launch Interface</h3>
+          <p class="sub-text">Select your preferred control mode:</p>
+          
+          <div class="step-actions">
+            <a href="remote/v1.html" class="btn-small secondary">
+              <span class="icon">⚡</span> Manual Control
+            </a>
+            
+            <a href="remote/v3.html" class="btn-small primary">
+              <span class="icon">✨</span> AI Control
+            </a>
+          </div>
+          
+        </div>
+      </div>
+
+    </div>
+
+    <div class="config-footer">
+      <span class="config-label">WebSocket Port:</span>
+      <code class="config-value">ws://localhost:8080/iot</code>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  <p>© 2025 SmartHome AI Simulation · v0.2 Pre-release · MIT License</p>
+</footer>
+
+<script src="assets/js/script.js"></script>
+
 </body>
 </html>
